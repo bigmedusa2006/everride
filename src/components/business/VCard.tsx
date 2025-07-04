@@ -7,11 +7,11 @@ import { Copy, User, Phone, Mail, MapPin, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
 
-const LOCAL_STORAGE_KEY = 'primeRidesVCardData';
+const LOCAL_STORAGE_KEY = 'everrideVCardData';
 
 const defaultBusinessInfo = {
   name: 'Biniam',
-  company: 'Prime Rides',
+  company: 'Everride',
   tagline: 'Professional Chauffeur Service',
   phone: '+1 (604) 728-1620',
   email: 'bigmedusa2006@gmail.com',
@@ -135,7 +135,7 @@ export function VCard() {
           >
             <img
               src={qrCodeUrl}
-              alt="Prime Rides QR Code"
+              alt="Everride QR Code"
               width="128"
               height="128"
               className="rounded-lg"
@@ -297,7 +297,7 @@ export function VCard() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <User className="h-4 w-4 text-primary-foreground" />
               </div>
-              Prime Rides QR Code
+              Everride QR Code
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
               Scan with your phone to book a ride instantly
@@ -307,7 +307,7 @@ export function VCard() {
             <div className="bg-white p-4 rounded-2xl shadow-lg">
               <img
                 src={qrCodeUrl}
-                alt="Prime Rides QR Code - Enlarged"
+                alt="Everride QR Code - Enlarged"
                 width="256"
                 height="256"
                 className="rounded-lg"

@@ -74,7 +74,7 @@ export function AppShell({ children, title }: AppShellProps) {
             className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
           >
             <Car className="h-5 w-5 transition-all group-hover:scale-110" />
-            <span className="sr-only">Prime Time</span>
+            <span className="sr-only">Everride</span>
           </Link>
           <div className="flex-1 w-full">
             {navItems.map((item) => (
@@ -99,7 +99,7 @@ export function AppShell({ children, title }: AppShellProps) {
                   className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
                 >
                   <Car className="h-5 w-5 transition-all group-hover:scale-110" />
-                  <span className="sr-only">Prime Time</span>
+                  <span className="sr-only">Everride</span>
                 </Link>
               </SheetHeader>
               <nav className="grid gap-6 text-lg font-medium mt-8">

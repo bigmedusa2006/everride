@@ -79,6 +79,7 @@ import { QuickActionsWidget } from '@/components/widgets/QuickActionsWidget';
 import { BusinessSettingsWidget } from '@/components/business/VCardSettingsWidget';
 import { useShiftTimer } from '@/hooks/useShiftTimer';
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SoundSettings } from "@/components/settings/SoundSettings";
 
 
 // ... Component implementation will be added here
@@ -211,7 +212,7 @@ export function DriverDashboard() {
                       <>
                         <CardHeader className="pb-3 relative z-10">
                           <div className="text-center mb-2">
-                            <h1 className="text-card-foreground text-lg font-bold">Prime Rides™</h1>
+                            <h1 className="text-card-foreground text-lg font-bold">Everride™</h1>
                           </div>
                           <div className="flex justify-center">
                             <Badge className="bg-destructive text-destructive-foreground text-xs rounded-full px-2 py-1">
@@ -234,7 +235,7 @@ export function DriverDashboard() {
                       <>
                         <CardHeader className="pb-3 relative z-10">
                           <div className="text-center mb-2">
-                            <h1 className="text-card-foreground text-lg font-bold">Prime Rides™</h1>
+                            <h1 className="text-card-foreground text-lg font-bold">Everride™</h1>
                           </div>
                           <div className="flex justify-center">
                             <Badge className={`${
@@ -403,7 +404,7 @@ export function DriverDashboard() {
             <TabsContent value="manual" className="space-y-2 m-0">
               <Card className="border border-border bg-card">
                 <CardHeader className="pb-3 relative z-10">
-                  <CardTitle className="text-card-foreground text-lg font-bold">Prime Rides™ Manual</CardTitle>
+                  <CardTitle className="text-card-foreground text-lg font-bold">Everride™ Manual</CardTitle>
                   <p className="text-sm text-muted-foreground">Complete guide to using your driver dashboard</p>
                 </CardHeader>
                 <CardContent className="relative z-10 p-4">
@@ -421,24 +422,13 @@ export function DriverDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="theme">Theme</Label>
-                    <ThemeToggle />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="accent-color">Accent Color</Label>
-                    <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(180, 100%, 25%)' }} aria-label="Set accent color to Teal" />
-                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(275, 100%, 25%)' }} aria-label="Set accent color to Indigo" />
-                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(346.8, 77.2%, 49.8%)' }} aria-label="Set accent color to Rose" />
-                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(45, 93%, 47%)' }} aria-label="Set accent color to Amber" />
-                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(262.1, 83.3%, 57.8%)' }} aria-label="Set accent color to Violet" />
-                    </div>
-                  </div>
+                  <ThemeSettings />
                 </CardContent>
               </Card>
 
               <NotificationSettings />
+
+              <SoundSettings />
             </TabsContent>
           </div>
         </Tabs>
@@ -491,7 +481,6 @@ export function DriverDashboard() {
         <NewTripCompletionDialog
           open={showFareEntry}
           onOpenChange={setShowFareEntry}
-          booking={null}
         />
 
         <ShiftAnalyticsModal

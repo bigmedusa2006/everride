@@ -58,7 +58,7 @@ export function UserGuide() {
       content: (
         <div className="space-y-4 text-sm">
           <p className="text-muted-foreground">
-            Welcome to Prime Rides™ - your comprehensive driver dashboard for managing rides, tracking earnings, and optimizing your business.
+            Welcome to Everride™ - your comprehensive driver dashboard for managing rides, tracking earnings, and optimizing your business.
           </p>
           <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
             <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Quick Start Checklist:</h4>

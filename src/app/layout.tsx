@@ -6,7 +6,7 @@ import { ThemeProvider as NextThemesProvider } from '@/components/theme-provider
 import { AppThemeProvider } from '@/contexts/ThemeContext';
 
 export const metadata: Metadata = {
-  title: 'Prime Time',
+  title: 'Everride',
   description: 'Your partner for optimizing your driving shifts.',
 };
 
