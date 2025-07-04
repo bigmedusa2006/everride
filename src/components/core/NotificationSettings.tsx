@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -6,9 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Bell, Clock, Target, CheckCircle, AlertCircle } from 'lucide-react';
+import { Bell, Clock, Target } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
 import { useToast } from '@/hooks/use-toast';
 
@@ -22,7 +19,6 @@ interface NotificationPreferences {
     tripCount: boolean;
     hoursWorked: boolean;
   };
-  browserNotifications: boolean;
 }
 
 const defaultPreferences: NotificationPreferences = {
@@ -35,22 +31,25 @@ const defaultPreferences: NotificationPreferences = {
     tripCount: true,
     hoursWorked: true,
   },
-  browserNotifications: true,
 };
 
 export function NotificationSettings() {
   const [preferences, setPreferences] = useState<NotificationPreferences>(defaultPreferences);
-  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const { toast } = useToast();
 
   useEffect(() => {
     const saved = localStorage.getItem('notificationPreferences');
     if (saved) {
-      setPreferences({ ...defaultPreferences, ...JSON.parse(saved) });
-    }
-
-    if ('Notification' in window) {
-      setNotificationPermission(Notification.permission);
+      const savedPrefs = JSON.parse(saved);
+      // Merge with defaults to ensure all keys are present, even if new ones are added later
+      setPreferences({ 
+        ...defaultPreferences, 
+        ...savedPrefs,
+        milestoneTypes: {
+          ...defaultPreferences.milestoneTypes,
+          ...savedPrefs.milestoneTypes,
+        }
+      });
     }
     notificationService.initialize();
   }, []);
@@ -62,48 +61,6 @@ export function NotificationSettings() {
       title: "Settings Saved",
       description: "Your notification preferences have been updated.",
     });
-  };
-
-  const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      setNotificationPermission(permission);
-      
-      if (permission === 'granted') {
-        const newPreferences = { ...preferences, browserNotifications: true };
-        savePreferences(newPreferences);
-        toast({
-          title: "Notifications Enabled",
-          description: "You'll now receive browser notifications.",
-        });
-      } else {
-        toast({
-          title: "Notifications Denied",
-          description: "Browser notifications won't work without permission.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-
-  const testNotification = () => {
-    if (notificationPermission === 'granted') {
-      new Notification('Prime Rides Test', {
-        body: 'This is how your notifications will appear!',
-        icon: '/logo.png',
-        badge: '/logo.png',
-      });
-      toast({
-        title: "Test Notification Sent",
-        description: "Check your system notifications!",
-      });
-    } else {
-      toast({
-        title: "Permission Required",
-        description: "Please enable browser notifications first.",
-        variant: "destructive",
-      });
-    }
   };
 
   const updatePreference = (key: keyof NotificationPreferences, value: any) => {
@@ -131,38 +88,6 @@ export function NotificationSettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Browser Notifications Section */}
-        <div className="space-y-4 rounded-lg border p-4">
-          <h3 className="text-base font-medium flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            Browser Notifications
-          </h3>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="permission-status" className="font-normal text-muted-foreground">Permission Status</Label>
-            <div className="flex items-center gap-2">
-              <Badge variant={notificationPermission === 'granted' ? 'default' : 'destructive'}>
-                {notificationPermission === 'granted' ? <CheckCircle className="h-3 w-3 mr-1" /> : <AlertCircle className="h-3 w-3 mr-1" />}
-                {notificationPermission}
-              </Badge>
-              {notificationPermission !== 'granted' && (
-                <Button size="sm" onClick={requestNotificationPermission}>Request</Button>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="browser-notifications" className="font-normal text-muted-foreground">Enable All System Alerts</Label>
-            <Switch
-              id="browser-notifications"
-              checked={preferences.browserNotifications}
-              onCheckedChange={(checked) => updatePreference('browserNotifications', checked)}
-              disabled={notificationPermission !== 'granted'}
-            />
-          </div>
-          <Button size="sm" variant="outline" onClick={testNotification} className="w-full">
-            Send Test Notification
-          </Button>
-        </div>
-
         {/* Pickup Reminders Section */}
         <div className="space-y-4 rounded-lg border p-4">
           <h3 className="text-base font-medium flex items-center gap-2">
@@ -182,8 +107,8 @@ export function NotificationSettings() {
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Reminder Time</Label>
                 <Select
-                  value={preferences.pickupReminderTime.toString()}
-                  onValueChange={(value) => updatePreference('pickupReminderTime', parseInt(value))}
+                  value={String(preferences.pickupReminderTime)}
+                  onValueChange={(value) => updatePreference('pickupReminderTime', parseInt(value, 10))}
                 >
                   <SelectTrigger>
                     <SelectValue />
