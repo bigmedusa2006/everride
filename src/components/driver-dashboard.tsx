@@ -41,14 +41,13 @@ import {
   FileText
 } from "lucide-react"
 import { useDriverSession } from "@/contexts/DriverSessionContext"
-import { ThemeSettings, QuickThemeToggle } from "@/components/core/ThemeSettings"
+import { ThemeSettings } from "@/components/core/ThemeSettings"
 import { UserGuide } from "@/components/core/UserGuide"
 import { NotificationSettings } from "@/components/core/NotificationSettings"
 
 
 import { ShiftConfigDialog, type ShiftConfig } from "@/components/shifts/ShiftConfigDialog"
 import { ShiftExtensionDialog } from "@/components/shifts/ShiftExtensionDialog"
-import { ShiftSummaryDialog } from "@/components/shifts/ShiftSummaryDialog"
 import { EndShiftConfirmDialog } from "@/components/shifts/EndShiftConfirmDialog"
 import { NewTripCompletionDialog } from "@/components/trips/NewTripCompletionDialog"
 
@@ -80,7 +79,6 @@ import { QuickActionsWidget } from '@/components/widgets/QuickActionsWidget';
 import { BusinessSettingsWidget } from '@/components/business/VCardSettingsWidget';
 import { useShiftTimer } from '@/hooks/useShiftTimer';
 import { ThemeToggle } from "@/components/theme-toggle";
-import { SoundSettings } from "@/components/settings/SoundSettings";
 
 
 // ... Component implementation will be added here
@@ -115,7 +113,6 @@ export function DriverDashboard() {
   // State for dialogs
   const [showShiftConfig, setShowShiftConfig] = useState(false)
   const [showEndShiftConfirm, setShowEndShiftConfirm] = useState(false)
-  const [showShiftSummary, setShowShiftSummary] = useState(false)
   const [showShiftAnalytics, setShowShiftAnalytics] = useState(false)
 
   const [showFareEntry, setShowFareEntry] = useState(false)
@@ -130,12 +127,6 @@ export function DriverDashboard() {
     }, 1000)
     return () => clearInterval(timer)
   }, [])
-
-  useEffect(() => {
-    if (state.lastShiftSummary && state.isShiftCompleted) {
-      setShowShiftSummary(true);
-    }
-  }, [state.lastShiftSummary, state.isShiftCompleted]);
 
   // Trip management functions
   const handleEndShift = () => {
@@ -209,7 +200,7 @@ export function DriverDashboard() {
 
                 <TabsContent value="shift-clock" className="mt-0">
                   <Card className="border-0 relative overflow-hidden bg-card/80 shadow-lg">
-                    {!state.isShiftActive && !state.isShiftCompleted ? (
+                    {!state.isShiftActive ? (
                       <>
                         <CardHeader className="pb-3 relative z-10">
                           <div className="text-center mb-2">
@@ -429,7 +420,6 @@ export function DriverDashboard() {
 
               <NotificationSettings />
 
-              <SoundSettings />
             </TabsContent>
           </div>
         </Tabs>
@@ -466,18 +456,6 @@ export function DriverDashboard() {
             (currentTime - state.shiftStartTime) / (1000 * 60 * 60) : 0
           }
         />
-
-        {state.lastShiftSummary && (
-          <ShiftSummaryDialog
-            open={showShiftSummary}
-            onClose={() => setShowShiftSummary(false)}
-            onConfirmClose={() => {
-              dispatch({ type: 'CLEAR_SUMMARY' });
-              setShowShiftSummary(false);
-            }}
-            summaryData={state.lastShiftSummary}
-          />
-        )}
 
         <NewTripCompletionDialog
           open={showFareEntry}

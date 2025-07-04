@@ -58,10 +58,8 @@ type State = {
   shiftExtensionOffered: boolean;
   driverName: string;
   extendedShiftHours: number;
-  isShiftCompleted: boolean;
   isOnBreak: boolean;
   currentBreakStartTime: number | null;
-  lastShiftSummary: ShiftSummaryData | null;
 };
 
 type Action =
@@ -78,10 +76,8 @@ type Action =
   | { type: 'OFFER_EXTENSION' }
   | { type: 'DECLINE_EXTENSION' }
   | { type: 'ACCEPT_EXTENSION'; payload: { hours: number } }
-  | { type: 'COMPLETE_SHIFT' }
   | { type: 'START_BREAK' }
-  | { type: 'END_BREAK' }
-  | { type: 'CLEAR_SUMMARY' };
+  | { type: 'END_BREAK' };
 
 const initialState: State = {
   isShiftActive: false,
@@ -98,10 +94,8 @@ const initialState: State = {
   shiftExtensionOffered: false,
   driverName: 'Driver',
   extendedShiftHours: 0,
-  isShiftCompleted: false,
   isOnBreak: false,
   currentBreakStartTime: null,
-  lastShiftSummary: null,
 };
 
 function sessionReducer(state: State, action: Action): State {
@@ -114,46 +108,28 @@ function sessionReducer(state: State, action: Action): State {
         dailyGoal: action.payload.dailyGoal,
         plannedShiftDurationHours: action.payload.durationHours,
         driverName: action.payload.driverName,
+        // Carry over the daily goal if it was changed before starting
+        dailyGoal: state.dailyGoal,
       };
     case 'END_SHIFT': {
-        if (!state.isShiftActive || !state.shiftStartTime) return state;
-
-        const shiftEndTime = Date.now();
-        const totalShiftSeconds = (shiftEndTime - state.shiftStartTime) / 1000;
-        const earningTimeSeconds = state.totalEarningTimeSeconds;
-        const breakTimeSeconds = totalShiftSeconds - earningTimeSeconds;
-        
-        const netEarnings = state.totalEarningsThisShift - state.totalExpensesThisShift;
-        const earningHours = earningTimeSeconds > 0 ? earningTimeSeconds / 3600 : 0;
-        const hourlyRate = earningHours > 0 ? netEarnings / earningHours : 0;
-        
-        const totalTrips = state.currentTrips.length;
-        const totalTips = state.currentTrips.reduce((sum, trip) => sum + trip.tip, 0);
-        const avgTripValue = totalTrips > 0 ? state.totalEarningsThisShift / totalTrips : 0;
-
-        const summary: ShiftSummaryData = {
-          totalEarnings: state.totalEarningsThisShift,
-          totalExpenses: state.totalExpensesThisShift,
-          netEarnings: netEarnings,
-          totalTrips: totalTrips,
-          totalTips: totalTips,
-          avgTripValue: avgTripValue,
-          totalTime: formatTime(totalShiftSeconds),
-          activeTime: formatTime(earningTimeSeconds),
-          breakTime: formatTime(breakTimeSeconds),
-          hourlyRate: hourlyRate,
-          shiftStartTime: state.shiftStartTime,
-          shiftEndTime: shiftEndTime,
-          dailyGoal: state.dailyGoal,
-        };
-
+        // This action now simply resets the shift state.
+        // The summary is displayed in the confirmation dialog before this is called.
         return {
           ...state,
           isShiftActive: false,
           isTripActive: false,
+          shiftStartTime: null,
+          currentTripStartTime: null,
+          plannedShiftDurationHours: null,
+          currentTrips: [],
+          currentExpenses: [],
+          totalEarningTimeSeconds: 0,
+          totalEarningsThisShift: 0,
+          totalExpensesThisShift: 0,
           shiftExtensionOffered: false,
-          isShiftCompleted: true,
-          lastShiftSummary: summary,
+          extendedShiftHours: 0,
+          isOnBreak: false,
+          currentBreakStartTime: null,
         };
       }
     case 'START_TRIP':
@@ -231,31 +207,11 @@ function sessionReducer(state: State, action: Action): State {
         return { ...state, shiftExtensionOffered: false };
     case 'ACCEPT_EXTENSION':
         return { ...state, extendedShiftHours: state.extendedShiftHours + action.payload.hours, shiftExtensionOffered: false };
-    case 'COMPLETE_SHIFT':
-        return { ...state, isShiftActive: false, isTripActive: false, isShiftCompleted: true };
     case 'START_BREAK':
         if(state.isTripActive) return state; // Cannot start break during trip
         return { ...state, isOnBreak: true, currentBreakStartTime: Date.now() };
     case 'END_BREAK':
         return { ...state, isOnBreak: false, currentBreakStartTime: null };
-    case 'CLEAR_SUMMARY':
-      return {
-        ...state,
-        lastShiftSummary: null,
-        shiftStartTime: null,
-        currentTripStartTime: null,
-        plannedShiftDurationHours: null,
-        dailyGoal: 200,
-        currentTrips: [],
-        currentExpenses: [],
-        totalEarningTimeSeconds: 0,
-        totalEarningsThisShift: 0,
-        totalExpensesThisShift: 0,
-        extendedShiftHours: 0,
-        isShiftCompleted: false,
-        isOnBreak: false,
-        currentBreakStartTime: null,
-      };
     default:
       return state;
   }
