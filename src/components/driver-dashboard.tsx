@@ -92,7 +92,6 @@ export function DriverDashboard() {
   const {
     getCurrentShiftTimeSeconds,
     getTotalEarningTimeSeconds: getEarningTimeFromHook,
-    getBreakTimeRemainingSeconds,
   } = useShiftTimer();
 
   // Calculate real-time earning time including active trip
@@ -102,6 +101,7 @@ export function DriverDashboard() {
     }
     return state.totalEarningTimeSeconds || 0;
   };
+
   const getDrivingEfficiency = () => {
     if (!state.shiftStartTime) return null;
     const totalShiftSeconds = getCurrentShiftTimeSeconds();
@@ -117,12 +117,6 @@ export function DriverDashboard() {
 
   const [showFareEntry, setShowFareEntry] = useState(false)
 
-  // Trip logging state
-  const [activeField, setActiveField] = useState<'fare' | 'tip' | 'time'>('fare')
-  const [fareValue, setFareValue] = useState('')
-  const [tipValue, setTipValue] = useState('')
-  const [timeValue, setTimeValue] = useState('')
-
   // Timer state
   const [currentTime, setCurrentTime] = useState(Date.now())
 
@@ -134,19 +128,11 @@ export function DriverDashboard() {
     return () => clearInterval(timer)
   }, [])
 
-  // Use the hook's getCurrentShiftTimeSeconds function directly
-
-
-
-  // Earnings calculations
-  const totalEarnings = state.currentTrips.reduce((sum, trip) => sum + trip.fare + trip.tip, 0)
-  const totalExpenses = state.currentExpenses.reduce((sum, expense) => sum + expense.amount, 0)
-  const netEarnings = totalEarnings - totalExpenses
-
-  const getNetHourlyRate = () => {
-    const earningHours = getTotalEarningTimeSeconds() / 3600
-    return earningHours > 0 ? netEarnings / earningHours : 0
-  }
+  useEffect(() => {
+    if (state.lastShiftSummary && state.isShiftCompleted) {
+      setShowShiftSummary(true);
+    }
+  }, [state.lastShiftSummary, state.isShiftCompleted]);
 
   // Trip management functions
   const handleEndShift = () => {
@@ -163,15 +149,6 @@ export function DriverDashboard() {
         durationHours: config.plannedDurationHours,
         driverName: config.driverName
       }
-    })
-  }
-
-  const updateDailyGoal = (newGoal: number) => {
-    if (newGoal < 50) return
-    if (newGoal > 600) return
-    dispatch({
-      type: 'SET_DAILY_GOAL',
-      payload: { goal: Math.min(600, Math.max(50, newGoal)) }
     })
   }
   
@@ -235,7 +212,7 @@ export function DriverDashboard() {
                 <div className="absolute -top-8 -left-8 w-16 h-16 bg-gradient-to-br from-accent/40 to-accent/50 rounded-full opacity-80 blur-sm"></div>
                 <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-gradient-to-br from-accent/50 to-accent/60 rounded-full opacity-60 blur-sm"></div>
 
-                {!state.isShiftActive ? (
+                {!state.isShiftActive && !state.isShiftCompleted ? (
                   // Pre-shift state - only show Start New Shift button
                   <>
                     <CardHeader className="pb-3 relative z-10">
@@ -634,37 +611,21 @@ export function DriverDashboard() {
         <EndShiftConfirmDialog
           open={showEndShiftConfirm}
           onOpenChange={setShowEndShiftConfirm}
-          onConfirm={() => {
-            handleEndShift()
-          }}
+          onConfirm={handleEndShift}
           shiftDurationHours={state.isShiftActive && state.shiftStartTime ? 
             (currentTime - state.shiftStartTime) / (1000 * 60 * 60) : 0
           }
         />
 
-        {showShiftSummary && (
+        {state.lastShiftSummary && (
           <ShiftSummaryDialog
-            open={true}
+            open={showShiftSummary}
             onClose={() => setShowShiftSummary(false)}
             onConfirmClose={() => {
-              setShowShiftSummary(false)
-              // Clear last summary functionality would need to be implemented in enhanced context
+              dispatch({ type: 'CLEAR_SUMMARY' });
+              setShowShiftSummary(false);
             }}
-            summaryData={{
-              totalEarnings: 0,
-              totalExpenses: 0,
-              netEarnings: 0,
-              totalTrips: 0,
-              totalTips: 0,
-              avgTripValue: 0,
-              totalTime: "00:00:00",
-              activeTime: "00:00:00",
-              breakTime: "00:00:00",
-              hourlyRate: 0,
-              shiftStartTime: Date.now(),
-              shiftEndTime: Date.now(),
-              dailyGoal: state.dailyGoal
-            }}
+            summaryData={state.lastShiftSummary}
           />
         )}
 

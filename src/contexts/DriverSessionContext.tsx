@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { createContext, useContext, useReducer } from 'react';
+import { formatTime } from '@/lib/formatTime';
 
 export type Trip = {
   fare: number;
@@ -12,6 +13,22 @@ export type Trip = {
 export type Expense = {
   amount: number;
   category: string;
+};
+
+export type ShiftSummaryData = {
+  totalEarnings: number;
+  totalExpenses: number;
+  netEarnings: number;
+  totalTrips: number;
+  totalTips: number;
+  avgTripValue: number;
+  totalTime: string;
+  activeTime: string;
+  breakTime: string;
+  hourlyRate: number;
+  shiftStartTime: number;
+  shiftEndTime: number;
+  dailyGoal: number;
 };
 
 
@@ -29,11 +46,11 @@ type State = {
   totalExpensesThisShift: number;
   shiftExtensionOffered: boolean;
   driverName: string;
-  // New properties for advanced timer and state management
   extendedShiftHours: number;
   isShiftCompleted: boolean;
   isOnBreak: boolean;
   currentBreakStartTime: number | null;
+  lastShiftSummary: ShiftSummaryData | null;
 };
 
 type Action =
@@ -48,7 +65,8 @@ type Action =
   | { type: 'ACCEPT_EXTENSION'; payload: { hours: number } }
   | { type: 'COMPLETE_SHIFT' }
   | { type: 'START_BREAK' }
-  | { type: 'END_BREAK' };
+  | { type: 'END_BREAK' }
+  | { type: 'CLEAR_SUMMARY' };
 
 const initialState: State = {
   isShiftActive: false,
@@ -64,11 +82,11 @@ const initialState: State = {
   totalExpensesThisShift: 0,
   shiftExtensionOffered: false,
   driverName: 'Driver',
-  // New properties
   extendedShiftHours: 0,
   isShiftCompleted: false,
   isOnBreak: false,
   currentBreakStartTime: null,
+  lastShiftSummary: null,
 };
 
 function sessionReducer(state: State, action: Action): State {
@@ -82,8 +100,47 @@ function sessionReducer(state: State, action: Action): State {
         plannedShiftDurationHours: action.payload.durationHours,
         driverName: action.payload.driverName,
       };
-    case 'END_SHIFT':
-      return { ...state, isShiftActive: false, isTripActive: false, shiftStartTime: null, isShiftCompleted: true };
+    case 'END_SHIFT': {
+        if (!state.isShiftActive || !state.shiftStartTime) return state;
+
+        const shiftEndTime = Date.now();
+        const totalShiftSeconds = (shiftEndTime - state.shiftStartTime) / 1000;
+        const earningTimeSeconds = state.totalEarningTimeSeconds;
+        const breakTimeSeconds = totalShiftSeconds - earningTimeSeconds;
+        
+        const netEarnings = state.totalEarningsThisShift - state.totalExpensesThisShift;
+        const earningHours = earningTimeSeconds > 0 ? earningTimeSeconds / 3600 : 0;
+        const hourlyRate = earningHours > 0 ? netEarnings / earningHours : 0;
+        
+        const totalTrips = state.currentTrips.length;
+        const totalTips = state.currentTrips.reduce((sum, trip) => sum + trip.tip, 0);
+        const avgTripValue = totalTrips > 0 ? state.totalEarningsThisShift / totalTrips : 0;
+
+        const summary: ShiftSummaryData = {
+          totalEarnings: state.totalEarningsThisShift,
+          totalExpenses: state.totalExpensesThisShift,
+          netEarnings: netEarnings,
+          totalTrips: totalTrips,
+          totalTips: totalTips,
+          avgTripValue: avgTripValue,
+          totalTime: formatTime(totalShiftSeconds),
+          activeTime: formatTime(earningTimeSeconds),
+          breakTime: formatTime(breakTimeSeconds),
+          hourlyRate: hourlyRate,
+          shiftStartTime: state.shiftStartTime,
+          shiftEndTime: shiftEndTime,
+          dailyGoal: state.dailyGoal,
+        };
+
+        return {
+          ...state,
+          isShiftActive: false,
+          isTripActive: false,
+          shiftExtensionOffered: false,
+          isShiftCompleted: true,
+          lastShiftSummary: summary,
+        };
+      }
     case 'START_TRIP':
       if (state.isOnBreak) return state; // Cannot start trip during break
       return { ...state, isTripActive: true, currentTripStartTime: Date.now() };
@@ -118,6 +175,24 @@ function sessionReducer(state: State, action: Action): State {
         return { ...state, isOnBreak: true, currentBreakStartTime: Date.now() };
     case 'END_BREAK':
         return { ...state, isOnBreak: false, currentBreakStartTime: null };
+    case 'CLEAR_SUMMARY':
+      return {
+        ...state,
+        lastShiftSummary: null,
+        shiftStartTime: null,
+        currentTripStartTime: null,
+        plannedShiftDurationHours: null,
+        dailyGoal: 200,
+        currentTrips: [],
+        currentExpenses: [],
+        totalEarningTimeSeconds: 0,
+        totalEarningsThisShift: 0,
+        totalExpensesThisShift: 0,
+        extendedShiftHours: 0,
+        isShiftCompleted: false,
+        isOnBreak: false,
+        currentBreakStartTime: null,
+      };
     default:
       return state;
   }
