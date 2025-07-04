@@ -15,8 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 interface NotificationPreferences {
   pickupReminders: boolean;
   pickupReminderTime: number; // minutes before pickup
-  shiftTimeAlerts: boolean;
-  shiftBreakReminders: boolean;
+  pickupReminderSound: boolean;
   performanceMilestones: boolean;
   milestoneTypes: {
     dailyEarnings: boolean;
@@ -29,8 +28,7 @@ interface NotificationPreferences {
 const defaultPreferences: NotificationPreferences = {
   pickupReminders: true,
   pickupReminderTime: 30,
-  shiftTimeAlerts: true,
-  shiftBreakReminders: true,
+  pickupReminderSound: true,
   performanceMilestones: true,
   milestoneTypes: {
     dailyEarnings: true,
@@ -180,22 +178,35 @@ export function NotificationSettings() {
             />
           </div>
           {preferences.pickupReminders && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Reminder Time</Label>
-              <Select
-                value={preferences.pickupReminderTime.toString()}
-                onValueChange={(value) => updatePreference('pickupReminderTime', parseInt(value))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="15">15 minutes before</SelectItem>
-                  <SelectItem value="30">30 minutes before</SelectItem>
-                  <SelectItem value="45">45 minutes before</SelectItem>
-                  <SelectItem value="60">1 hour before</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="space-y-4 pt-4 border-t mt-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Reminder Time</Label>
+                <Select
+                  value={preferences.pickupReminderTime.toString()}
+                  onValueChange={(value) => updatePreference('pickupReminderTime', parseInt(value))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="15">15 minutes before</SelectItem>
+                    <SelectItem value="30">30 minutes before</SelectItem>
+                    <SelectItem value="45">45 minutes before</SelectItem>
+                    <SelectItem value="60">1 hour before</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center justify-between pt-4 border-t">
+                <Label htmlFor="pickup-reminder-sound" className="font-normal text-muted-foreground flex items-center gap-2">
+                  <Bell className="h-4 w-4" />
+                  Enable Sound Alert
+                </Label>
+                <Switch
+                  id="pickup-reminder-sound"
+                  checked={!!preferences.pickupReminderSound}
+                  onCheckedChange={(checked) => updatePreference('pickupReminderSound', checked)}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -215,32 +226,29 @@ export function NotificationSettings() {
             />
           </div>
           {preferences.performanceMilestones && (
-            <div className="space-y-3 pt-2">
+            <div className="space-y-3 pt-4 border-t mt-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="daily-earnings" className="text-xs text-muted-foreground">Daily Earnings Goals</Label>
+                <Label htmlFor="daily-earnings" className="text-sm text-muted-foreground">Daily Earnings Goals</Label>
                 <Switch
                   id="daily-earnings"
                   checked={preferences.milestoneTypes.dailyEarnings}
                   onCheckedChange={(checked) => updateMilestoneType('dailyEarnings', checked)}
-                  size="sm"
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="trip-count" className="text-xs text-muted-foreground">Trip Count Achievements</Label>
+                <Label htmlFor="trip-count" className="text-sm text-muted-foreground">Trip Count Achievements</Label>
                 <Switch
                   id="trip-count"
                   checked={preferences.milestoneTypes.tripCount}
                   onCheckedChange={(checked) => updateMilestoneType('tripCount', checked)}
-                  size="sm"
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="hours-worked" className="text-xs text-muted-foreground">Hours Worked Milestones</Label>
+                <Label htmlFor="hours-worked" className="text-sm text-muted-foreground">Hours Worked Milestones</Label>
                 <Switch
                   id="hours-worked"
                   checked={preferences.milestoneTypes.hoursWorked}
                   onCheckedChange={(checked) => updateMilestoneType('hoursWorked', checked)}
-                  size="sm"
                 />
               </div>
             </div>
