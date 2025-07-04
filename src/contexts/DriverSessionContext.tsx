@@ -3,15 +3,26 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useReducer } from 'react';
 
+export type Trip = {
+  fare: number;
+  tip: number;
+};
+
+export type Expense = {
+  amount: number;
+  category: string;
+};
+
+
 type State = {
   isShiftActive: boolean;
   isTripActive: boolean;
   shiftStartTime: number | null;
   currentTripStartTime: number | null;
   plannedShiftDurationHours: number | null;
-  dailyGoal: number | null;
-  currentTrips: any[];
-  currentExpenses: any[];
+  dailyGoal: number;
+  currentTrips: Trip[];
+  currentExpenses: Expense[];
   totalEarningTimeSeconds: number;
   shiftExtensionOffered: boolean;
   driverName: string;
@@ -26,8 +37,8 @@ type Action =
   | { type: 'START_SHIFT'; payload: { startTime: number; dailyGoal: number; durationHours: number; driverName: string } }
   | { type: 'END_SHIFT' }
   | { type: 'START_TRIP' }
-  | { type: 'END_TRIP'; payload: any }
-  | { type: 'ADD_EXPENSE'; payload: any }
+  | { type: 'END_TRIP'; payload: Trip }
+  | { type: 'ADD_EXPENSE'; payload: Expense }
   | { type: 'SET_DAILY_GOAL'; payload: { goal: number } }
   | { type: 'OFFER_EXTENSION' }
   | { type: 'DECLINE_EXTENSION' }
