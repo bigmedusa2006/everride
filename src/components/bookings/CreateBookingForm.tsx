@@ -144,14 +144,10 @@ export function CreateBookingForm() {
     const currentStepConfig = steps[step];
     if (!currentStepConfig) return false;
 
-    for (const field of currentStepConfig.fields) {
-        if (field === 'scheduledDate') {
-            if (!selectedDate) return false;
-        } else {
-            if (!formData[field as keyof BookingData]) return false;
-        }
-    }
-    return true;
+    return currentStepConfig.fields.every(field => {
+      if (field === 'scheduledDate') return !!selectedDate;
+      return !!formData[field as keyof BookingData];
+    });
   };
   
   const isFormValid = validateStep(0) && validateStep(1) && validateStep(2);
@@ -446,10 +442,10 @@ export function CreateBookingForm() {
                     <div key={count} className="flex items-center space-x-2">
                       <RadioGroupItem
                         value={count}
-                        id={"passenger-form-" + count}
+                        id={`passenger-form-${count}`}
                       />
                       <Label
-                        htmlFor={"passenger-form-" + count}
+                        htmlFor={`passenger-form-${count}`}
                         className="text-sm font-medium cursor-pointer"
                       >
                         {count}

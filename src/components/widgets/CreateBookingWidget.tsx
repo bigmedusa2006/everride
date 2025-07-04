@@ -54,7 +54,8 @@ export function CreateBookingWidget({ onBookingCreated }: { onBookingCreated?: (
 
   // Form state
   const [formData, setFormData] = useState<Partial<BookingData>>({
-    passengers: '1'
+    passengers: '1',
+    notes: ''
   });
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -168,8 +169,15 @@ export function CreateBookingWidget({ onBookingCreated }: { onBookingCreated?: (
     }
   };
 
-  const handleSubmit = () => {
-    if (!isFormValid || !selectedDate) return;
+  const handleSubmit = async () => {
+    if (!isFormValid || !selectedDate) {
+      toast({
+        title: "Incomplete Form",
+        description: "Please fill out all required fields before confirming.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -186,7 +194,7 @@ export function CreateBookingWidget({ onBookingCreated }: { onBookingCreated?: (
         status: 'scheduled',
       };
 
-      addBooking(bookingData as Omit<Booking, 'id'>);
+      await addBooking(bookingData as Omit<Booking, 'id'>);
 
       toast({
         title: "Booking Confirmed! 🎉",
@@ -198,7 +206,7 @@ export function CreateBookingWidget({ onBookingCreated }: { onBookingCreated?: (
       }
 
       // Reset form
-      setFormData({ passengers: '1' });
+      setFormData({ passengers: '1', notes: '' });
       setSelectedDate(undefined);
       setCurrentStep(0);
       setEstimatedFare(null);

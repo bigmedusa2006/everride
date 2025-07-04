@@ -1,0 +1,12 @@
+specVersion: "v1"
+serviceId: "everride-db"
+location: "northamerica-northeast1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "everride-db"
+      cloudSql:
+        instanceId: "everride-db"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]

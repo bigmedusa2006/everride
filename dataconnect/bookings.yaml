@@ -1,0 +1,72 @@
+connector:
+  name: everride-connector
+  type: sql
+  databaseType: postgresql # or mysql if you use MySQL
+  datasource: studio  # match your Cloud SQL datasource ID
+  queries:
+    getBookings:
+      type: Query
+      description: Retrieve all bookings ordered by creation date descending
+      operation:
+        sql: |
+          SELECT * FROM bookings ORDER BY created_at DESC;
+
+    getBookingById:
+      type: Query
+      description: Retrieve a single booking by ID
+      operation:
+        sql: |
+          SELECT * FROM bookings WHERE id = :id;
+      arguments:
+        - name: id
+          type: string
+          required: true
+
+  mutations:
+    createBooking:
+      type: Mutation
+      description: Insert a new booking
+      operation:
+        sql: |
+          INSERT INTO bookings (driver_id, customer_id, pickup_location, dropoff_location, scheduled_date, fare, tip, status, created_at, updated_at)
+          VALUES (:driver_id, :customer_id, :pickup_location, :dropoff_location, :scheduled_date, :fare, :tip, :status, NOW(), NOW())
+          RETURNING *;
+      arguments:
+        - name: driver_id
+          type: string
+          required: true
+        - name: customer_id
+          type: string
+          required: true
+        - name: pickup_location
+          type: string
+          required: true
+        - name: dropoff_location
+          type: string
+          required: true
+        - name: scheduled_date
+          type: string
+          required: true
+        - name: fare
+          type: float
+          required: true
+        - name: tip
+          type: float
+          required: false
+        - name: status
+          type: string
+          required: true
+
+    updateBookingStatus:
+      type: Mutation
+      description: Update status of a booking
+      operation:
+        sql: |
+          UPDATE bookings SET status = :status, updated_at = NOW() WHERE id = :id RETURNING *;
+      arguments:
+        - name: id
+          type: string
+          required: true
+        - name: status
+          type: string
+          required: true
