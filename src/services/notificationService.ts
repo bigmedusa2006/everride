@@ -19,12 +19,23 @@ class NotificationService {
       if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') {
         return;
       }
+
+      // Read preferences from localStorage
+      const prefsString = localStorage.getItem('notificationPreferences');
+      const defaultPrefs = { pickupReminders: true, pickupReminderTime: 30, pickupReminderSound: true };
+      const prefs = prefsString ? {...defaultPrefs, ...JSON.parse(prefsString)} : defaultPrefs;
+
+      if (!prefs.pickupReminders) {
+        console.log('Pickup reminders are disabled by user preference.');
+        return;
+      }
   
       const now = new Date();
       const timeToPickup = pickupTime.getTime() - now.getTime();
   
-      // Schedule reminder 15 minutes before pickup
-      const reminderTime = timeToPickup - (15 * 60 * 1000);
+      // Schedule reminder based on user preference
+      const reminderOffset = (prefs.pickupReminderTime || 30) * 60 * 1000;
+      const reminderTime = timeToPickup - reminderOffset;
   
       if (reminderTime > 0) {
         setTimeout(() => {
@@ -32,6 +43,7 @@ class NotificationService {
             body: `Time to head to ${pickupLocation} for ${clientName}'s pickup.`,
             tag: `booking-reminder-${bookingId}`,
             icon: '/logo.png',
+            silent: !prefs.pickupReminderSound,
           });
         }, reminderTime);
       }

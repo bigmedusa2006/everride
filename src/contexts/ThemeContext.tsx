@@ -58,7 +58,8 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
       document.documentElement.style.setProperty('--radius', `${radius}rem`);
       const selectedColor = COLOR_OPTIONS.find(c => c.id === color);
       if (selectedColor) {
-        document.documentElement.style.setProperty('--color-primary', selectedColor.value);
+        document.documentElement.style.setProperty('--primary', selectedColor.value);
+        document.documentElement.style.setProperty('--ring', selectedColor.value);
       }
     }
   }, [color, radius, isMounted]);
