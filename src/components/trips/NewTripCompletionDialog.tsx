@@ -1,7 +1,7 @@
 
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useDriverSession } from '@/contexts/DriverSessionContext';
@@ -127,6 +127,9 @@ export function NewTripCompletionDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md w-full p-4 sm:p-6 bg-card border-none shadow-2xl rounded-2xl flex flex-col h-auto">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Complete Trip</DialogTitle>
+        </DialogHeader>
         {/* Display Screen */}
         <div className="bg-muted/50 rounded-xl p-4 text-right space-y-2">
             <p className="text-xs uppercase text-muted-foreground">{activeInput}</p>
