@@ -5,9 +5,12 @@ import { createContext, useContext, useReducer } from 'react';
 import { formatTime } from '@/lib/formatTime';
 
 export type Trip = {
+  id: string;
   fare: number;
   tip: number;
   durationSeconds: number;
+  startTime: number;
+  designationType: 'prime' | 'platform';
 };
 
 export type Expense = {
@@ -57,7 +60,10 @@ type Action =
   | { type: 'START_SHIFT'; payload: { startTime: number; dailyGoal: number; durationHours: number; driverName: string } }
   | { type: 'END_SHIFT' }
   | { type: 'START_TRIP' }
-  | { type: 'END_TRIP'; payload: Trip }
+  | { type: 'END_TRIP'; payload: { fare: number; tip: number; durationSeconds: number; } }
+  | { type: 'ADD_COMPLETED_TRIP'; payload: Trip }
+  | { type: 'REMOVE_TRIP'; payload: string } // tripId
+  | { type: 'UPDATE_TRIP'; payload: Trip }
   | { type: 'ADD_EXPENSE'; payload: Expense }
   | { type: 'SET_DAILY_GOAL'; payload: { goal: number } }
   | { type: 'OFFER_EXTENSION' }
@@ -144,16 +150,50 @@ function sessionReducer(state: State, action: Action): State {
     case 'START_TRIP':
       if (state.isOnBreak) return state; // Cannot start trip during break
       return { ...state, isTripActive: true, currentTripStartTime: Date.now() };
-    case 'END_TRIP':
-      const tripDuration = state.currentTripStartTime ? (Date.now() - state.currentTripStartTime) / 1000 : 0;
-      return {
-        ...state,
-        isTripActive: false,
-        currentTripStartTime: null,
-        currentTrips: [...state.currentTrips, action.payload],
-        totalEarningTimeSeconds: state.totalEarningTimeSeconds + tripDuration,
-        totalEarningsThisShift: state.totalEarningsThisShift + action.payload.fare + action.payload.tip,
-      };
+    case 'END_TRIP': {
+        if (!state.currentTripStartTime) return state; // Should not happen
+        const newTrip: Trip = {
+            id: crypto.randomUUID(),
+            startTime: state.currentTripStartTime,
+            designationType: 'platform',
+            ...action.payload,
+        };
+        return {
+            ...state,
+            isTripActive: false,
+            currentTripStartTime: null,
+            currentTrips: [...state.currentTrips, newTrip],
+            totalEarningTimeSeconds: state.totalEarningTimeSeconds + action.payload.durationSeconds,
+            totalEarningsThisShift: state.totalEarningsThisShift + action.payload.fare + action.payload.tip,
+        };
+    }
+    case 'ADD_COMPLETED_TRIP':
+        return {
+            ...state,
+            currentTrips: [...state.currentTrips, action.payload],
+            totalEarningsThisShift: state.totalEarningsThisShift + action.payload.fare + action.payload.tip,
+        };
+    case 'REMOVE_TRIP': {
+        const tripToRemove = state.currentTrips.find(t => t.id === action.payload);
+        if (!tripToRemove) return state;
+
+        const newTotalEarnings = state.totalEarningsThisShift - (tripToRemove.fare + tripToRemove.tip);
+        const newTotalEarningTime = state.totalEarningTimeSeconds - tripToRemove.durationSeconds;
+
+        return {
+            ...state,
+            currentTrips: state.currentTrips.filter(t => t.id !== action.payload),
+            totalEarningsThisShift: newTotalEarnings,
+            totalEarningTimeSeconds: newTotalEarningTime,
+        };
+    }
+    case 'UPDATE_TRIP':
+        return {
+            ...state,
+            currentTrips: state.currentTrips.map(t =>
+                t.id === action.payload.id ? action.payload : t
+            ),
+        };
     case 'ADD_EXPENSE':
       return { 
         ...state, 

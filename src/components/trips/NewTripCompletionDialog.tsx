@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, DollarSign, MapPin, User, Car, Timer, Calculator } from "lucide-react";
 import { useBookingStore } from '@/stores/bookingStore';
-import { useDriverSession } from '@/contexts/DriverSessionContext';
+import { useDriverSession, type Trip } from '@/contexts/DriverSessionContext';
 import { useToast } from '@/hooks/use-toast';
 import type { Booking } from '@shared/schema';
 import { RideFeedback } from '@/components/feedback/RideFeedback';
@@ -77,6 +77,18 @@ export function NewTripCompletionDialog({
       if (booking) {
         // Complete a pre-scheduled booking
         await completeBooking(booking.id, { fare, tip });
+        
+        // Also add to the current shift's trip log
+        const newTripPayload: Trip = {
+            id: booking.id,
+            fare: fare,
+            tip: tip,
+            durationSeconds: 0, // Booked trips don't have a live-tracked duration
+            startTime: new Date(`${booking.scheduledDate} ${booking.scheduledTime}`).getTime(),
+            designationType: 'prime'
+        };
+        sessionDispatch({ type: 'ADD_COMPLETED_TRIP', payload: newTripPayload });
+
         setCompletedBookingId(booking.id);
         toast({
           title: "Reservation Confirmed",
