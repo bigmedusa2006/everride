@@ -154,7 +154,7 @@ export function DriverDashboard() {
       <MilestoneNotifier />
       <div className="max-w-md mx-auto min-h-screen flex flex-col relative z-10">
         <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-5 bg-card border-b h-16 px-2">
+          <TabsList className="grid w-full grid-cols-5 bg-card border-b h-16 px-4">
             <TabsTrigger value="dashboard" className="flex flex-col items-center justify-center gap-1 text-xs h-full data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none text-muted-foreground transition-colors duration-150 ease-in-out">
               <LayoutDashboard className="h-5 w-5" />
               <span>Dashboard</span>
@@ -177,9 +177,9 @@ export function DriverDashboard() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex-1 overflow-y-auto p-2">
+          <div className="flex-1 overflow-y-auto p-4">
 
-            <TabsContent value="dashboard" className="space-y-2 m-0">
+            <TabsContent value="dashboard" className="space-y-4 m-0">
               <Tabs defaultValue="shift-clock" className="w-full">
                 <TabsList className="grid w-full grid-cols-4 mb-3 h-12 bg-muted border-0 shadow-inner">
                   <TabsTrigger value="shift-clock" className="text-xs h-10 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
@@ -368,11 +368,11 @@ export function DriverDashboard() {
               </Tabs>
               </TabsContent>
 
-            <TabsContent value="bookings" className="space-y-2 m-0">
+            <TabsContent value="bookings" className="space-y-4 m-0">
               <PrivateBookingsCard />
             </TabsContent>
 
-            <TabsContent value="expenses" className="space-y-2 m-0">
+            <TabsContent value="expenses" className="space-y-4 m-0">
               <Tabs defaultValue="recent-expenses" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-3 h-12 bg-muted">
                   <TabsTrigger value="recent-expenses" className="text-xs h-10 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
@@ -395,7 +395,7 @@ export function DriverDashboard() {
               </Tabs>
               </TabsContent>
 
-            <TabsContent value="manual" className="space-y-2 m-0">
+            <TabsContent value="manual" className="space-y-4 m-0">
               <Card className="border border-border bg-card">
                 <CardHeader className="pb-3 relative z-10">
                   <CardTitle className="text-card-foreground text-lg font-bold">Everride™ Manual</CardTitle>
@@ -407,7 +407,7 @@ export function DriverDashboard() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="settings" className="space-y-4 p-2 m-0">
+            <TabsContent value="settings" className="space-y-4 m-0">
                <Card>
                 <CardHeader>
                   <CardTitle>Appearance</CardTitle>
