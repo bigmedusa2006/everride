@@ -1,19 +1,19 @@
 import { AppShell } from '@/components/app-shell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function BookingsPage() {
+export default function HistoryPage() {
   return (
-    <AppShell title="Reservations">
+    <AppShell title="History">
       <div className="flex-1 space-y-4 p-4 sm:p-8 pt-6">
         <Card>
           <CardHeader>
-            <CardTitle>My Reservations</CardTitle>
+            <CardTitle>History</CardTitle>
             <CardDescription>
-              Manage your private reservations and client information.
+              View your past trips and earnings history.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Reservation management will be implemented here.</p>
+            <p>History functionality will be implemented here.</p>
           </CardContent>
         </Card>
       </div>

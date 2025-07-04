@@ -11,6 +11,7 @@ import {
   Menu,
   Settings,
   Bot,
+  HelpCircle
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -41,13 +42,18 @@ const navItems = [
   },
   {
     href: '/bookings',
-    label: 'Bookings',
+    label: 'Reservations',
     icon: Calendar,
   },
   {
     href: '/optimize',
-    label: 'Optimize Target',
+    label: 'Target',
     icon: Bot,
+  },
+  {
+    href: '/manual',
+    label: 'Manual',
+    icon: HelpCircle,
   },
   {
     href: '/settings',
