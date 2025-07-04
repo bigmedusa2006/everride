@@ -1,4 +1,3 @@
-
 'use client';
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
@@ -21,6 +20,7 @@ import {
   Receipt,
   Settings,
   HelpCircle,
+  MapPin
 } from "lucide-react"
 import { useDriverSession } from "@/contexts/DriverSessionContext"
 import { ThemeSettings, QuickThemeToggle } from "@/components/core/ThemeSettings"
