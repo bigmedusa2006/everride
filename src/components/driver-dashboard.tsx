@@ -439,12 +439,8 @@ export function DriverDashboard() {
 
             <TabsContent value="settings" className="space-y-2 p-2 m-0 bg-background text-foreground mobile-padding">
               {/* Settings Sub-tabs - Mobile Optimized */}
-              <Tabs defaultValue="business" className="w-full">
-                <TabsList className="grid w-full grid-cols-5 mb-3 h-12 mobile-touch-target bg-card/80 border-0 shadow-md">
-                  <TabsTrigger value="business" className="text-xs h-10 mobile-touch-target text-card-foreground data-[state=active]:text-accent data-[state=active]:bg-accent/20">
-                    <CircleDollarSign className="h-4 w-4 mr-1" />
-                    <span className="font-medium">Business</span>
-                  </TabsTrigger>
+              <Tabs defaultValue="theme" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 mb-3 h-12 mobile-touch-target bg-card/80 border-0 shadow-md">
                   <TabsTrigger value="theme" className="text-xs h-10 mobile-touch-target text-card-foreground data-[state=active]:text-accent data-[state=active]:bg-accent/20">
                     <Settings className="h-4 w-4 mr-1" />
                     <span className="font-medium">Theme</span>
@@ -462,22 +458,6 @@ export function DriverDashboard() {
                     <span className="font-medium">Data</span>
                   </TabsTrigger>
                 </TabsList>
-
-                <TabsContent value="business" className="mt-0">
-                  {/* Business Settings - Booking Availability Control */}
-                  <Card className="m-2 border border-border bg-card">
-                    <CardHeader className="pb-3 relative z-10">
-                      <CardTitle className="text-card-foreground text-lg font-bold flex items-center gap-2">
-                        <CircleDollarSign className="h-5 w-5 text-accent" />
-                        Booking Availability
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">Manage when customers can create new bookings</p>
-                    </CardHeader>
-                    <CardContent className="relative z-10 p-4">
-                      <BusinessSettingsWidget />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
 
                 <TabsContent value="theme" className="mt-0">
                   {/* Quick Theme Toggle */}
