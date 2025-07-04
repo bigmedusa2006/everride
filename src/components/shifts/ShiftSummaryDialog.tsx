@@ -31,7 +31,7 @@ export function ShiftSummaryDialog({
 • Total Shift Time: ${summaryData.totalTime}
 • Active Earning Time: ${summaryData.activeTime}
 • Break Time: ${summaryData.breakTime}
-• Efficiency: ${((parseFloat(summaryData.activeTime.split(':')[0]) + parseFloat(summaryData.activeTime.split(':')[1])/60) / (parseFloat(summaryData.totalTime.split(':')[0]) + parseFloat(summaryData.totalTime.split(':')[1])/60) * 100).toFixed(1)}%
+• Efficiency: ${(summaryData.netEarnings > 0 && summaryData.totalEarnings > 0 ? (summaryData.activeTime.split(':').reduce((acc, time) => (60 * acc) + +time, 0) / summaryData.totalTime.split(':').reduce((acc, time) => (60 * acc) + +time, 0) * 100) : 0).toFixed(1)}%
 
 📊 Performance:
 • Total Rides: ${summaryData.totalTrips}
@@ -43,7 +43,7 @@ export function ShiftSummaryDialog({
 🎯 Goals:
 • Daily Goal: $${summaryData.dailyGoal.toFixed(2)}
 • Remaining: $${Math.max(0, summaryData.dailyGoal - summaryData.netEarnings).toFixed(2)}
-• Progress: ${(summaryData.netEarnings / summaryData.dailyGoal * 100).toFixed(1)}%
+• Progress: ${(summaryData.dailyGoal > 0 ? (summaryData.netEarnings / summaryData.dailyGoal * 100) : 0).toFixed(1)}%
 
 💰 Tips & Earnings:
 • Total Tips: $${summaryData.totalTips.toFixed(2)}
@@ -146,7 +146,7 @@ export function ShiftSummaryDialog({
                 <div className="flex justify-between">
                   <span>Progress:</span>
                   <span className="font-bold">
-                    {(summaryData.netEarnings / summaryData.dailyGoal * 100).toFixed(1)}%
+                    {(summaryData.dailyGoal > 0 ? summaryData.netEarnings / summaryData.dailyGoal * 100 : 0).toFixed(1)}%
                   </span>
                 </div>
               </div>
