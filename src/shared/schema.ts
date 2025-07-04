@@ -12,4 +12,6 @@ export type Booking = {
   tip: number;
   notes: string;
   status: BookingStatus;
+  createdAt: string;
+  updatedAt: string;
 };

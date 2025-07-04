@@ -59,11 +59,12 @@ export function BookingStatusMenu({
 
   const handleStatusChange = async (newStatus: BookingStatus) => {
     try {
-      const updatedBooking = { ...booking, status: newStatus };
-      await updateBooking(booking.id, updatedBooking);
+      // Create a partial update object
+      const bookingUpdate: Partial<Omit<Booking, 'id'>> = { status: newStatus };
+      await updateBooking(booking.id, bookingUpdate);
 
       if (newStatus === "completed" && onComplete) {
-        onComplete(booking);
+        onComplete({ ...booking, status: newStatus });
       }
 
       toast({

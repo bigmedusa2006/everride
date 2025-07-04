@@ -1,13 +1,13 @@
 import { create } from 'zustand';
-import type { Booking } from '@shared/schema';
+import type { Booking, BookingStatus } from '@shared/schema';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 type BookingState = {
   bookings: Booking[];
   isLoading: boolean;
   loadUpcomingBookings: () => void;
-  addBooking: (booking: Omit<Booking, 'id' | 'tip'>) => Promise<void>;
-  updateBooking: (id: string, booking: Booking) => void;
+  addBooking: (booking: Omit<Booking, 'id' | 'tip' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateBooking: (id: string, booking: Partial<Omit<Booking, 'id'>>) => void;
   deleteBooking: (id: string) => Promise<void>;
   completeBooking: (id: string, details: { fare: number; tip: number }) => Promise<void>;
 };
@@ -37,15 +37,22 @@ export const useBookingStore = create<BookingState>()(
         set({ bookings: upcoming, isLoading: false });
       },
       addBooking: async (booking) => {
-        const newBooking = { ...booking, id: crypto.randomUUID(), tip: 0 } as Booking;
+        const now = new Date().toISOString();
+        const newBooking: Booking = { 
+          ...booking, 
+          id: crypto.randomUUID(), 
+          tip: 0,
+          createdAt: now,
+          updatedAt: now,
+        };
         set((state) => ({
           bookings: [...state.bookings, newBooking].sort((a, b) => new Date(`${a.scheduledDate} ${a.scheduledTime}`).getTime() - new Date(`${b.scheduledDate} ${b.scheduledTime}`).getTime()),
         }));
       },
-      updateBooking: (id, updatedBooking) =>
+      updateBooking: (id, bookingUpdate) =>
         set((state) => ({
           bookings: state.bookings.map((booking) =>
-            booking.id === id ? updatedBooking : booking
+            booking.id === id ? { ...booking, ...bookingUpdate, updatedAt: new Date().toISOString() } : booking
           ),
         })),
       deleteBooking: async (id: string) => {
@@ -57,7 +64,7 @@ export const useBookingStore = create<BookingState>()(
         set((state) => ({
           bookings: state.bookings.map((booking) =>
             booking.id === id
-              ? { ...booking, status: 'completed', fare: details.fare, tip: details.tip }
+              ? { ...booking, status: 'completed', fare: details.fare, tip: details.tip, updatedAt: new Date().toISOString() }
               : booking
           ),
         }));
