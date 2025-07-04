@@ -617,14 +617,17 @@ export function DriverDashboard() {
         <ShiftExtensionDialog
           open={state.shiftExtensionOffered}
           onExtend={() => {
-            // Handle shift extension - would need to be implemented in enhanced context
-            console.log('Shift extension requested');
+            const currentTotalHours = (state.plannedShiftDurationHours || 0) + state.extendedShiftHours;
+            const extensionHours = Math.min(2, 13 - currentTotalHours);
+            if (extensionHours > 0) {
+              dispatch({ type: 'ACCEPT_EXTENSION', payload: { hours: extensionHours } });
+            }
           }}
           onDecline={() => {
-            // Handle decline extension - would need to be implemented in enhanced context
-            console.log('Shift extension declined');
+            dispatch({ type: 'DECLINE_EXTENSION' });
+            contextEndShift();
           }}
-          currentHours={state.plannedShiftDurationHours || 8}
+          currentHours={(state.plannedShiftDurationHours || 0) + state.extendedShiftHours}
           maxAllowedHours={13}
         />
 
