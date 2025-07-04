@@ -15,6 +15,11 @@ type State = {
   totalEarningTimeSeconds: number;
   shiftExtensionOffered: boolean;
   driverName: string;
+  // New properties for advanced timer and state management
+  extendedShiftHours: number;
+  isShiftCompleted: boolean;
+  isOnBreak: boolean;
+  currentBreakStartTime: number | null;
 };
 
 type Action =
@@ -24,8 +29,12 @@ type Action =
   | { type: 'END_TRIP'; payload: any }
   | { type: 'ADD_EXPENSE'; payload: any }
   | { type: 'SET_DAILY_GOAL'; payload: { goal: number } }
-  | { type: 'OFFER_SHIFT_EXTENSION' }
-  | { type: 'DECLINE_SHIFT_EXTENSION' };
+  | { type: 'OFFER_EXTENSION' }
+  | { type: 'DECLINE_EXTENSION' }
+  | { type: 'ACCEPT_EXTENSION'; payload: { hours: number } }
+  | { type: 'COMPLETE_SHIFT' }
+  | { type: 'START_BREAK' }
+  | { type: 'END_BREAK' };
 
 const initialState: State = {
   isShiftActive: false,
@@ -39,6 +48,11 @@ const initialState: State = {
   totalEarningTimeSeconds: 0,
   shiftExtensionOffered: false,
   driverName: 'Driver',
+  // New properties
+  extendedShiftHours: 0,
+  isShiftCompleted: false,
+  isOnBreak: false,
+  currentBreakStartTime: null,
 };
 
 function sessionReducer(state: State, action: Action): State {
@@ -53,11 +67,11 @@ function sessionReducer(state: State, action: Action): State {
         driverName: action.payload.driverName,
       };
     case 'END_SHIFT':
-      return { ...state, isShiftActive: false, isTripActive: false, shiftStartTime: null };
+      return { ...state, isShiftActive: false, isTripActive: false, shiftStartTime: null, isShiftCompleted: true };
     case 'START_TRIP':
+      if (state.isOnBreak) return state; // Cannot start trip during break
       return { ...state, isTripActive: true, currentTripStartTime: Date.now() };
     case 'END_TRIP':
-      // Simplified logic
       const tripDuration = state.currentTripStartTime ? (Date.now() - state.currentTripStartTime) / 1000 : 0;
       return {
         ...state,
@@ -70,10 +84,19 @@ function sessionReducer(state: State, action: Action): State {
       return { ...state, currentExpenses: [...state.currentExpenses, action.payload] };
     case 'SET_DAILY_GOAL':
       return { ...state, dailyGoal: action.payload.goal };
-    case 'OFFER_SHIFT_EXTENSION':
+    case 'OFFER_EXTENSION':
       return { ...state, shiftExtensionOffered: true };
-    case 'DECLINE_SHIFT_EXTENSION':
+    case 'DECLINE_EXTENSION':
         return { ...state, shiftExtensionOffered: false };
+    case 'ACCEPT_EXTENSION':
+        return { ...state, extendedShiftHours: state.extendedShiftHours + action.payload.hours, shiftExtensionOffered: false };
+    case 'COMPLETE_SHIFT':
+        return { ...state, isShiftActive: false, isTripActive: false, isShiftCompleted: true };
+    case 'START_BREAK':
+        if(state.isTripActive) return state; // Cannot start break during trip
+        return { ...state, isOnBreak: true, currentBreakStartTime: Date.now() };
+    case 'END_BREAK':
+        return { ...state, isOnBreak: false, currentBreakStartTime: null };
     default:
       return state;
   }
