@@ -9,6 +9,7 @@ export type Booking = {
   scheduledDate: string;
   scheduledTime: string;
   fare: number;
+  tip: number;
   notes: string;
   status: BookingStatus;
 };

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -95,20 +96,19 @@ export function CreateBookingForm() {
   ];
 
   useEffect(() => {
+    const fetchBusinessSettings = async () => {
+      try {
+        const response = await fetch('/api/business-settings');
+        if (response.ok) {
+          const settings = await response.json();
+          setBusinessSettings(settings);
+        }
+      } catch (error) {
+        console.error('Failed to fetch business settings:', error);
+      }
+    };
     fetchBusinessSettings();
   }, []);
-
-  const fetchBusinessSettings = async () => {
-    try {
-      const response = await fetch('/api/business-settings');
-      if (response.ok) {
-        const settings = await response.json();
-        setBusinessSettings(settings);
-      }
-    } catch (error) {
-      console.error('Failed to fetch business settings:', error);
-    }
-  };
 
   const calculateFareEstimate = async (pickup?: string, dropoff?: string) => {
     if (!pickup || !dropoff) {
@@ -181,7 +181,7 @@ export function CreateBookingForm() {
         status: 'scheduled',
       };
 
-      await addBooking(bookingData as Omit<Booking, 'id'>);
+      await addBooking(bookingData);
 
       toast({
         title: "Booking Confirmed! 🎉",
@@ -338,7 +338,7 @@ export function CreateBookingForm() {
                           <span className="font-medium text-sm sm:text-base">Estimated Fare</span>
                         </div>
                         <span className="text-xl sm:text-2xl font-bold text-green-600">
-                          ${estimatedFare.toFixed(2)}
+                          $${(estimatedFare || 0).toFixed(2)}
                         </span>
                       </div>
                     </CardContent>
@@ -476,7 +476,7 @@ export function CreateBookingForm() {
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground">Estimated Fare</p>
                         <p className="text-2xl font-bold text-green-600">
-                          ${(estimatedFare || 45).toFixed(2)}
+                          $${(estimatedFare || 45).toFixed(2)}
                         </p>
                       </div>
                     </div>
