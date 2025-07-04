@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
@@ -39,6 +40,7 @@ import {
   HelpCircle,
   FileText
 } from "lucide-react"
+import Link from 'next/link';
 import { useDriverSession } from "@/contexts/DriverSessionContext"
 import { ThemeSettings, QuickThemeToggle } from "@/components/core/ThemeSettings"
 import { UserGuide } from "@/components/core/UserGuide"
@@ -61,7 +63,7 @@ import { PrivateBookingsCard } from "@/components/bookings/Reservations"
 import { RecordedFareCard } from "@/components/trips/RecordedFareCard"
 import { VCard } from "@/components/business/VCard"
 
-import { ExpenseTrackerCard } from "@/components/expenses/ExpenseTrackerCard" // Import ExpenseTrackerCard
+import { ExpenseTrackerCard } from "@/components/expenses/ExpenseTrackerCard" 
 import { PickupReminderNotification } from "@/components/notifications/PickupReminderNotification"
 
 import { formatTime } from "@/lib/formatTime"
@@ -438,104 +440,18 @@ export function DriverDashboard() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-2 p-2 m-0 bg-background text-foreground mobile-padding">
-              {/* Settings Sub-tabs - Mobile Optimized */}
-              <Tabs defaultValue="theme" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-3 h-12 mobile-touch-target bg-card/80 border-0 shadow-md">
-                  <TabsTrigger value="theme" className="text-xs h-10 mobile-touch-target text-card-foreground data-[state=active]:text-accent data-[state=active]:bg-accent/20">
-                    <Settings className="h-4 w-4 mr-1" />
-                    <span className="font-medium">Theme</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="notifications" className="text-xs h-10 mobile-touch-target text-card-foreground data-[state=active]:text-accent data-[state=active]:bg-accent/20">
-                    <AlertTriangle className="h-4 w-4 mr-1" />
-                    <span className="font-medium">Alerts</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="about" className="text-xs h-10 mobile-touch-target text-card-foreground data-[state=active]:text-accent data-[state=active]:bg-accent/20">
-                    <HelpCircle className="h-4 w-4 mr-1" />
-                    <span className="font-medium">About</span>
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="theme" className="mt-0">
-                  {/* Quick Theme Toggle */}
-                  <Card className="m-2 border border-border bg-card">
+              {/* Settings have been moved to their own page at /settings */}
+               <Card className="m-2 border border-border bg-card">
                     <CardHeader className="pb-3 relative z-10">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-card-foreground text-lg font-bold">Quick Theme</CardTitle>
-                        <QuickThemeToggle asIcon={false} />
-                      </div>
-                    </CardHeader>
-                  </Card>
-
-                  {/* Advanced Theme Settings */}
-                  <Card className="m-2 border border-border bg-card">
-                    <CardHeader className="pb-3 relative z-10">
-                      <CardTitle className="text-card-foreground text-lg font-bold">Advanced Theme Settings</CardTitle>
+                      <CardTitle className="text-card-foreground text-lg font-bold">Settings</CardTitle>
+                       <p className="text-sm text-muted-foreground">All settings have been moved to a dedicated page.</p>
                     </CardHeader>
                     <CardContent className="relative z-10 p-4">
-                      <ThemeSettings />
+                      <Button asChild className="w-full">
+                        <Link href="/settings">Go to Settings</Link>
+                      </Button>
                     </CardContent>
                   </Card>
-                </TabsContent>
-
-                <TabsContent value="notifications" className="mt-0">
-                  <Card className="m-2 border border-border bg-card">
-                    <CardHeader className="pb-3 relative z-10">
-                      <CardTitle className="text-card-foreground text-lg font-bold">Notification Settings</CardTitle>
-                      <p className="text-sm text-muted-foreground">Manage your notification preferences</p>
-                    </CardHeader>
-                    <CardContent className="relative z-10 p-4">
-                      <NotificationSettings />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                <TabsContent value="about" className="mt-0">
-                  {/* About Information */}
-                  <Card className="m-2 border border-border bg-card">
-                    <CardHeader className="pb-3 relative z-10">
-                      <CardTitle className="text-card-foreground text-lg font-bold">About Prime Rides™</CardTitle>
-                    </CardHeader>
-                    <CardContent className="relative z-10 p-4">
-                      <div className="space-y-4 text-sm">
-                        <div>
-                          <h3 className="font-semibold text-card-foreground mb-2">Application Information</h3>
-                          <p className="text-muted-foreground text-xs mb-2">
-                            Prime Rides™ is a comprehensive driver dashboard designed for professional ride services and chauffeur operations.
-                          </p>
-                        </div>
-
-                        <div>
-                          <h3 className="font-semibold text-card-foreground mb-2">Features</h3>
-                          <ul className="text-xs text-muted-foreground space-y-1 ml-4">
-                            <li>• Shift time tracking and management</li>
-                            <li>• AI-powered booking system</li>
-                            <li>• Expense tracking and categorization</li>
-                            <li>• Real-time earnings calculations</li>
-                            <li>• Professional business card generation</li>
-                            <li>• Performance analytics and reporting</li>
-                          </ul>
-                        </div>
-
-                        <div>
-                          <h3 className="font-semibold text-card-foreground mb-2">Technology</h3>
-                          <ul className="text-xs text-muted-foreground space-y-1 ml-4">
-                            <li>• Progressive Web App (PWA) enabled</li>
-                            <li>• Mobile-first responsive design</li>
-                            <li>• Real-time data synchronization</li>
-                            <li>• Offline capability with local storage</li>
-                          </ul>
-                        </div>
-
-                        <div className="pt-4 border-t border-border">
-                          <p className="text-xs text-muted-foreground text-center">
-                            For comprehensive usage instructions, visit the <strong>Manual</strong> tab.
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
             </TabsContent>
           </div>
         </Tabs>
