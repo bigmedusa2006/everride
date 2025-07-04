@@ -110,6 +110,21 @@ export const useShiftTimer = () => {
     const breakElapsed = Math.floor((currentTime - state.currentBreakStartTime) / 1000);
     return Math.max(0, maxBreakDuration - breakElapsed);
   }, [state.isOnBreak, state.currentBreakStartTime, currentTime]);
+  
+  const getDrivingEfficiency = useCallback(() => {
+    const shiftTime = getCurrentShiftTimeSeconds();
+    const earningTime = getTotalEarningTimeSeconds();
+    if (shiftTime === 0) return 0;
+    return Math.round((earningTime / shiftTime) * 100);
+  }, [getCurrentShiftTimeSeconds, getTotalEarningTimeSeconds]);
+
+  const getNetHourlyRate = useCallback(() => {
+    const earningHours = getTotalEarningTimeSeconds() / 3600;
+    const netEarnings = state.totalEarningsThisShift - state.totalExpensesThisShift;
+    if (earningHours === 0) return 0;
+    return netEarnings / earningHours;
+  }, [getTotalEarningTimeSeconds, state.totalEarningsThisShift, state.totalExpensesThisShift]);
+
 
   return {
     currentTime,
@@ -119,5 +134,7 @@ export const useShiftTimer = () => {
     isShiftOvertime,
     getTotalEarningTimeSeconds,
     getBreakTimeRemainingSeconds,
+    getDrivingEfficiency,
+    getNetHourlyRate
   };
 };

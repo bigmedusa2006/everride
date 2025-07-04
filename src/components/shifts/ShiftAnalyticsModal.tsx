@@ -22,21 +22,19 @@ interface ShiftAnalyticsModalProps {
 
 export function ShiftAnalyticsModal({ open, onOpenChange }: ShiftAnalyticsModalProps) {
   const { state } = useDriverSession();
-  const { getTotalEarningTimeSeconds, getCurrentShiftTimeSeconds } = useShiftTimer();
+  const { 
+    getCurrentShiftTimeSeconds,
+    getTotalEarningTimeSeconds,
+    getDrivingEfficiency,
+    getNetHourlyRate 
+  } = useShiftTimer();
 
+  // Calculate current shift stats using the hook
   const shiftTimeSeconds = getCurrentShiftTimeSeconds();
   const earningTimeSeconds = getTotalEarningTimeSeconds();
   const downtimeSeconds = shiftTimeSeconds - earningTimeSeconds;
-  
-  const efficiency = useMemo(() => {
-    return shiftTimeSeconds > 0 ? Math.round((earningTimeSeconds / shiftTimeSeconds) * 100) : 0;
-  }, [shiftTimeSeconds, earningTimeSeconds]);
-  
-  const hourlyRate = useMemo(() => {
-    const earningHours = earningTimeSeconds / 3600;
-    const netEarnings = state.totalEarningsThisShift - state.totalExpensesThisShift;
-    return earningHours > 0 ? netEarnings / earningHours : 0;
-  }, [earningTimeSeconds, state.totalEarningsThisShift, state.totalExpensesThisShift]);
+  const efficiency = getDrivingEfficiency();
+  const hourlyRate = getNetHourlyRate();
 
   const tripStats = useMemo(() => {
     const trips = state.currentTrips;
@@ -65,6 +63,8 @@ export function ShiftAnalyticsModal({ open, onOpenChange }: ShiftAnalyticsModalP
     const lastTrip = trips[trips.length - 1];
     return (lastTrip.fare || 0) + (lastTrip.tip || 0);
   }, [state.currentTrips]);
+  
+  const netEarnings = state.totalEarningsThisShift - state.totalExpensesThisShift;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -125,7 +125,7 @@ export function ShiftAnalyticsModal({ open, onOpenChange }: ShiftAnalyticsModalP
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs sm:text-sm text-muted-foreground">Net Earnings</span>
-                <span className="font-bold text-sm sm:text-base">${(state.totalEarningsThisShift - state.totalExpensesThisShift).toFixed(2)}</span>
+                <span className="font-bold text-sm sm:text-base">${netEarnings.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs sm:text-sm text-muted-foreground">Hourly Rate</span>
@@ -216,17 +216,17 @@ export function ShiftAnalyticsModal({ open, onOpenChange }: ShiftAnalyticsModalP
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs sm:text-sm">Daily Target Progress</span>
                   <span className="text-xs sm:text-sm font-bold">
-                    ${state.totalEarningsThisShift.toFixed(2)} / ${state.dailyGoal.toFixed(2)}
+                    ${netEarnings.toFixed(2)} / ${state.dailyGoal.toFixed(2)}
                   </span>
                 </div>
                 <Progress 
-                  value={state.dailyGoal > 0 ? Math.min((state.totalEarningsThisShift / state.dailyGoal) * 100, 100) : 0} 
+                  value={state.dailyGoal > 0 ? Math.min((netEarnings / state.dailyGoal) * 100, 100) : 0} 
                   className="h-2 sm:h-3 mb-2"
                 />
                 <div className="text-xs text-muted-foreground">
-                  {state.totalEarningsThisShift >= state.dailyGoal 
+                  {netEarnings >= state.dailyGoal 
                     ? "🎉 Daily target achieved!" 
-                    : `$${(state.dailyGoal - state.totalEarningsThisShift).toFixed(2)} remaining`
+                    : `$${(state.dailyGoal - netEarnings).toFixed(2)} remaining`
                   }
                 </div>
               </div>
@@ -236,17 +236,17 @@ export function ShiftAnalyticsModal({ open, onOpenChange }: ShiftAnalyticsModalP
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs sm:text-sm">Shift Time Progress</span>
                     <span className="text-xs sm:text-sm font-bold">
-                      {formatTime(shiftTimeSeconds)} / {state.plannedShiftDurationHours}h
+                      {formatTime(shiftTimeSeconds)} / {state.plannedShiftDurationHours + state.extendedShiftHours}h
                     </span>
                   </div>
                   <Progress 
-                    value={state.plannedShiftDurationHours > 0 ? Math.min((shiftTimeSeconds / (state.plannedShiftDurationHours * 3600)) * 100, 100) : 0} 
+                    value={state.plannedShiftDurationHours > 0 ? Math.min((shiftTimeSeconds / ((state.plannedShiftDurationHours + state.extendedShiftHours) * 3600)) * 100, 100) : 0} 
                     className="h-2 sm:h-3 mb-2"
                   />
                   <div className="text-xs text-muted-foreground">
-                    {shiftTimeSeconds >= (state.plannedShiftDurationHours * 3600)
+                    {shiftTimeSeconds >= ((state.plannedShiftDurationHours + state.extendedShiftHours) * 3600)
                       ? "Planned shift duration completed"
-                      : `${formatTime((state.plannedShiftDurationHours * 3600) - shiftTimeSeconds)} remaining`
+                      : `${formatTime(((state.plannedShiftDurationHours + state.extendedShiftHours) * 3600) - shiftTimeSeconds)} remaining`
                     }
                   </div>
                 </div>
@@ -256,5 +256,5 @@ export function ShiftAnalyticsModal({ open, onOpenChange }: ShiftAnalyticsModalP
         </Card>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
