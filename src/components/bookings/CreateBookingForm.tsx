@@ -54,6 +54,7 @@ export function CreateBookingForm() {
 
   const [formData, setFormData] = useState<Partial<BookingData>>({
     passengers: "1",
+    notes: "",
   });
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -143,10 +144,14 @@ export function CreateBookingForm() {
     const currentStepConfig = steps[step];
     if (!currentStepConfig) return false;
 
-    return currentStepConfig.fields.every((field) => {
-      if (field === "scheduledDate") return !!selectedDate;
-      return !!formData[field as keyof BookingData];
-    });
+    for (const field of currentStepConfig.fields) {
+        if (field === 'scheduledDate') {
+            if (!selectedDate) return false;
+        } else {
+            if (!formData[field as keyof BookingData]) return false;
+        }
+    }
+    return true;
   };
   
   const isFormValid = validateStep(0) && validateStep(1) && validateStep(2);
@@ -174,9 +179,8 @@ export function CreateBookingForm() {
     }
 
     setIsSubmitting(true);
+    
     try {
-      const bookingNotes = `Passengers: ${formData.passengers || '1'}${formData.notes ? `. ${formData.notes}` : ''}`;
-
       const bookingData: Omit<Booking, 'id' | 'tip' | 'createdAt' | 'updatedAt'> = {
         clientName: formData.clientName!,
         clientPhone: formData.clientPhone!,
@@ -185,7 +189,7 @@ export function CreateBookingForm() {
         scheduledDate: format(selectedDate, 'yyyy-MM-dd'),
         scheduledTime: formData.scheduledTime!,
         fare: estimatedFare || 45,
-        notes: bookingNotes,
+        notes: `Passengers: ${formData.passengers || '1'}${formData.notes ? `. ${formData.notes}` : ''}`,
         status: 'scheduled',
       };
 
@@ -198,7 +202,6 @@ export function CreateBookingForm() {
         )} at ${formData.scheduledTime}`,
       });
 
-      // Reset form
       setFormData({ passengers: '1', notes: '' });
       setSelectedDate(undefined);
       setCurrentStep(0);
@@ -238,6 +241,8 @@ export function CreateBookingForm() {
       </div>
     );
   }
+  
+  const currentStepConfig = steps[currentStep];
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -246,13 +251,13 @@ export function CreateBookingForm() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
             <div>
               <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                {steps[currentStep].icon && (
-                  <steps[currentStep].icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                {currentStepConfig.icon && (
+                  <currentStepConfig.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 )}
-                {steps[currentStep].title}
+                {currentStepConfig.title}
               </CardTitle>
               <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                {steps[currentStep].description}
+                {currentStepConfig.description}
               </p>
             </div>
             <Badge
@@ -617,5 +622,3 @@ export function CreateBookingForm() {
     </div>
   );
 }
-
-    
