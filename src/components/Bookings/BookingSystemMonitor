@@ -1,0 +1,253 @@
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { AlertTriangle, CheckCircle, XCircle, RefreshCw, Wifi, WifiOff, Shield } from "lucide-react";
+import { useBookingStore } from '@/stores/bookingStore';
+import { useToast } from '@/hooks/use-toast';
+
+interface SystemHealth {
+  bookingApi: 'healthy' | 'degraded' | 'offline';
+  database: 'healthy' | 'degraded' | 'offline';
+  network: 'online' | 'offline';
+  lastChecked: Date;
+}
+
+export function BookingSystemMonitor() {
+  const { toast } = useToast();
+  const { recoverBookingSystem, error, isLoading } = useBookingStore();
+  const [health, setHealth] = useState<SystemHealth>({
+    bookingApi: 'healthy',
+    database: 'healthy',
+    network: navigator.onLine ? 'online' : 'offline',
+    lastChecked: new Date()
+  });
+  const [isChecking, setIsChecking] = useState(false);
+
+  const checkSystemHealth = async () => {
+    setIsChecking(true);
+    const newHealth: SystemHealth = {
+      network: navigator.onLine ? 'online' : 'offline',
+      bookingApi: 'offline',
+      database: 'offline',
+      lastChecked: new Date()
+    };
+
+    try {
+      // Check booking API
+      const bookingResponse = await fetch('/api/health/bookings', { 
+        method: 'GET',
+        cache: 'no-cache'
+      });
+      newHealth.bookingApi = bookingResponse.ok ? 'healthy' : 'degraded';
+
+      // Check database
+      const dbResponse = await fetch('/api/health/database', { 
+        method: 'GET',
+        cache: 'no-cache'
+      });
+      newHealth.database = dbResponse.ok ? 'healthy' : 'degraded';
+
+    } catch (error) {
+      console.error('Health check failed:', error);
+    }
+
+    setHealth(newHealth);
+    setIsChecking(false);
+  };
+
+  useEffect(() => {
+    checkSystemHealth();
+    
+    const interval = setInterval(checkSystemHealth, 30000); // Check every 30 seconds
+    
+    const handleOnline = () => {
+      setHealth(prev => ({ ...prev, network: 'online' }));
+      checkSystemHealth();
+    };
+    
+    const handleOffline = () => {
+      setHealth(prev => ({ ...prev, network: 'offline' }));
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'healthy':
+      case 'online':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'degraded':
+        return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+      case 'offline':
+        return <XCircle className="h-4 w-4 text-red-600" />;
+      default:
+        return <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'healthy':
+      case 'online':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'degraded':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'offline':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const handleRecovery = async () => {
+    toast({
+      title: "Recovery Started",
+      description: "Attempting to recover booking system...",
+    });
+
+    const success = await recoverBookingSystem?.();
+    
+    if (success) {
+      toast({
+        title: "Recovery Successful",
+        description: "Booking system has been restored.",
+      });
+      checkSystemHealth();
+    } else {
+      toast({
+        title: "Recovery Failed",
+        description: "Please refresh the page or contact support.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const overallStatus = health.network === 'offline' ? 'offline' :
+    (health.bookingApi === 'offline' || health.database === 'offline') ? 'offline' :
+    (health.bookingApi === 'degraded' || health.database === 'degraded') ? 'degraded' : 'healthy';
+
+  return (
+    <Card className="w-full">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Shield className="h-5 w-5 text-blue-600" />
+            Booking System Status
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Badge className={getStatusColor(overallStatus)}>
+              {overallStatus.charAt(0).toUpperCase() + overallStatus.slice(1)}
+            </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={checkSystemHealth}
+              disabled={isChecking}
+              className="h-8 px-2"
+            >
+              <RefreshCw className={`h-3 w-3 ${isChecking ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-3">
+        {/* Network Status */}
+        <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+          <span className="text-sm font-medium">Network Connection</span>
+          <div className="flex items-center gap-2">
+            {health.network === 'online' ? (
+              <>
+                <Wifi className="h-4 w-4 text-green-600" />
+                <span className="text-sm text-green-600">Online</span>
+              </>
+            ) : (
+              <>
+                <WifiOff className="h-4 w-4 text-red-600" />
+                <span className="text-sm text-red-600">Offline</span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Service Status */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+            <span className="text-sm font-medium">Booking API</span>
+            <div className="flex items-center gap-2">
+              {getStatusIcon(health.bookingApi)}
+              <span className="text-sm capitalize">{health.bookingApi}</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+            <span className="text-sm font-medium">Database</span>
+            <div className="flex items-center gap-2">
+              {getStatusIcon(health.database)}
+              <span className="text-sm capitalize">{health.database}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Error Display */}
+        {error && (
+          <Alert className="border-red-200 bg-red-50">
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <AlertDescription className="text-red-800">
+              {error}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRecovery}
+                disabled={isLoading}
+                className="ml-2 h-6 px-2 text-xs"
+              >
+                {isLoading ? 'Recovering...' : 'Recover'}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Overall Status Alert */}
+        {overallStatus !== 'healthy' && !error && (
+          <Alert className="border-yellow-200 bg-yellow-50">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-800">
+              {overallStatus === 'degraded' && 
+                "Some services are experiencing issues. Functionality may be limited."
+              }
+              {overallStatus === 'offline' && 
+                "Critical services are offline. Please check your connection."
+              }
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRecovery}
+                disabled={isLoading}
+                className="ml-2 h-6 px-2 text-xs"
+              >
+                Recover System
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Last Checked */}
+        <div className="text-xs text-muted-foreground text-center pt-2 border-t">
+          Last checked: {health.lastChecked.toLocaleTimeString()}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

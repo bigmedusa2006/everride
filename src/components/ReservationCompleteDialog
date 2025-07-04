@@ -1,0 +1,267 @@
+import React, { useState, useEffect } from 'react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Clock, DollarSign, MapPin, User, Car, Timer, Calculator } from "lucide-react";
+import { useBookingStore } from '@/stores/bookingStore';
+import { useToast } from '@/hooks/use-toast';
+import type { Booking } from '@shared/schema';
+import { formatCurrencyPlain } from '@/lib/currency';
+import { RideFeedback } from '@/components/feedback/RideFeedback';
+
+interface NewTripCompletionDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  booking?: Booking | null;
+}
+
+export function NewTripCompletionDialog({ 
+  open, 
+  onOpenChange, 
+  booking = null
+}: NewTripCompletionDialogProps) {
+  const { completeBooking } = useBookingStore();
+  const { toast } = useToast();
+
+  // Form state
+  const [fareAmount, setFareAmount] = useState('');
+  const [tipAmount, setTipAmount] = useState('0');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Feedback state
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [completedBookingId, setCompletedBookingId] = useState<number | null>(null);
+
+  // Initialize form with booking data if available
+  useEffect(() => {
+    if (open && booking) {
+      // Pre-populate fare from booking
+      const bookingFare = booking.fare;
+      setFareAmount(bookingFare.toFixed(2));
+      setTipAmount('0');
+    } else if (open && !booking) {
+      // Reset for manual trips
+      setFareAmount('');
+      setTipAmount('0');
+    }
+  }, [open, booking]);
+
+  // Quick tip buttons
+  const quickTipAmounts = [0, 5, 10, 15, 20];
+
+  const handleQuickTip = (amount: number) => {
+    setTipAmount(amount.toString());
+  };
+
+  const handleConfirm = async () => {
+    const fare = parseFloat(fareAmount) || 0;
+    const tip = parseFloat(tipAmount) || 0;
+    const total = fare + tip;
+
+    if (fare <= 0) {
+      toast({
+        title: "Invalid Fare",
+        description: "Please enter a valid fare amount",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (booking) {
+        await completeBooking(booking.id, total);
+        // Set up feedback dialog
+        setCompletedBookingId(booking.id);
+      }
+
+      toast({
+        title: "Reservation Confirmed",
+        description: `Fare: $${fare.toFixed(2)}, Tip: $${tip.toFixed(2)}, Total: $${total.toFixed(2)}`,
+      });
+
+      // Close completion dialog and show feedback
+      onOpenChange(false);
+      
+      // Show feedback dialog after a short delay for better UX
+      if (booking) {
+        setTimeout(() => setShowFeedback(true), 500);
+      }
+    } catch (error) {
+      console.error('Error confirming reservation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to confirm reservation. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const totalAmount = (parseFloat(fareAmount) || 0) + (parseFloat(tipAmount) || 0);
+
+  return (
+    <>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="max-w-md mx-auto">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2">
+            <Calculator className="h-5 w-5" />
+            Confirm Reservation
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Enter the trip details to confirm this {booking ? 'private booking' : 'platform trip'}.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <div className="space-y-4">
+          {/* Booking Information (if available) */}
+          {booking && (
+            <Card className="bg-muted/20">
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      <Car className="h-3 w-3 mr-1" />
+                      Private Booking
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{booking.clientName}</span>
+                    <span className="text-muted-foreground">• {booking.clientPhone}</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                    <div className="space-y-1">
+                      <div className="text-green-600 font-medium">From: {booking.pickupLocation}</div>
+                      <div className="text-red-600 font-medium">To: {booking.dropoffLocation}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span>{booking.scheduledDate} at {booking.scheduledTime}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Fare Input */}
+          <div className="space-y-2">
+            <Label htmlFor="fare" className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              {booking ? 'Agreed Fare' : 'Trip Fare'}
+            </Label>
+            <Input
+              id="fare"
+              type="number"
+              step="0.01"
+              min="0"
+              value={fareAmount}
+              onChange={(e) => setFareAmount(e.target.value)}
+              placeholder="0.00"
+              className="text-lg font-mono"
+            />
+            {booking && (
+              <p className="text-xs text-muted-foreground">
+                Pre-filled from booking: ${formatCurrencyPlain(booking.fare)}
+              </p>
+            )}
+          </div>
+
+          {/* Tip Input with Quick Buttons */}
+          <div className="space-y-2">
+            <Label htmlFor="tip" className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Customer Tip
+            </Label>
+            <Input
+              id="tip"
+              type="number"
+              step="0.01"
+              min="0"
+              value={tipAmount}
+              onChange={(e) => setTipAmount(e.target.value)}
+              placeholder="0.00"
+              className="text-lg font-mono"
+            />
+
+            {/* Quick Tip Buttons */}
+            <div className="flex gap-2 flex-wrap">
+              <Label className="text-xs text-muted-foreground">Quick Tips:</Label>
+              {quickTipAmounts.map((amount) => (
+                <Button
+                  key={amount}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-8 px-3"
+                  onClick={() => handleQuickTip(amount)}
+                  type="button"
+                >
+                  ${amount}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Trip Summary */}
+          <Card className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+            <CardContent className="p-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Fare:</span>
+                  <span className="font-mono">${(parseFloat(fareAmount) || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Tip:</span>
+                  <span className="font-mono">${(parseFloat(tipAmount) || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold border-t pt-2">
+                  <span>Total Earnings:</span>
+                  <span className="font-mono text-green-600">${totalAmount.toFixed(2)}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <AlertDialogFooter className="flex gap-2">
+          <AlertDialogCancel disabled={isSubmitting}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            disabled={isSubmitting || !fareAmount || parseFloat(fareAmount) <= 0}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            {isSubmitting ? 'Confirming...' : 'Confirmed'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+    {/* Feedback Dialog - Shows after trip completion */}
+    {completedBookingId && (
+      <RideFeedback
+        bookingId={completedBookingId}
+        open={showFeedback}
+        onOpenChange={setShowFeedback}
+        onSubmitted={() => {
+          setShowFeedback(false);
+          setCompletedBookingId(null);
+          toast({
+            title: "Thank you!",
+            description: "Your feedback helps us provide better service.",
+          });
+        }}
+      />
+    )}
+    </>
+  );
+}

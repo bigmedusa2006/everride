@@ -1,0 +1,266 @@
+'use client';
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useEffect, useState } from "react";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import type { Booking } from "@shared/schema";
+import { useBookingStore } from "@/stores/bookingStore";
+import { useToast } from "@/hooks/use-toast";
+
+// Mock location service for Google Places predictions
+const getPlacePredictions = async (query: string): Promise<string[]> => {
+  // Fallback location suggestions for Vancouver area
+  const suggestions = [
+    "Vancouver International Airport (YVR), Grant McConachie Way, Richmond, BC, Canada",
+    "Downtown Vancouver, Vancouver, BC, Canada",
+    "Granville Island, Vancouver, BC, Canada",
+    "UBC Campus, Vancouver, BC, Canada",
+    "Stanley Park, Vancouver, BC, Canada",
+    "Richmond Centre, Richmond, BC, Canada",
+    "Metrotown, Burnaby, BC, Canada",
+    "Surrey Central, Surrey, BC, Canada"
+  ];
+  
+  return suggestions.filter(suggestion => 
+    suggestion.toLowerCase().includes(query.toLowerCase())
+  ).slice(0, 5);
+};
+
+const bookingFormSchema = z.object({
+  clientName: z.string().min(2, "Name must be at least 2 characters."),
+  clientPhone: z.string().optional(),
+  pickupLocation: z.string().min(5, "Pickup location is required."),
+  dropoffLocation: z.string().min(5, "Dropoff location is required."),
+  scheduledDate: z.date({ required_error: "A date is required." }),
+  scheduledTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)."),
+  fare: z.coerce.number().positive("Fare must be a positive number."),
+  status: z.enum(['scheduled', 'confirmed', 'completed', 'cancelled', 'no-show']),
+});
+
+type BookingFormValues = z.infer<typeof bookingFormSchema>;
+
+interface EditBookingDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  booking: Booking | null;
+}
+
+export function EditBookingDialog({ open, onOpenChange, booking }: EditBookingDialogProps) {
+  const { updateBooking } = useBookingStore();
+  const { toast } = useToast();
+
+  const [pickupSuggestions, setPickupSuggestions] = useState<string[]>([]);
+  const [dropoffSuggestions, setDropoffSuggestions] = useState<string[]>([]);
+  const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
+  const [showDropoffSuggestions, setShowDropoffSuggestions] = useState(false);
+
+  const form = useForm<BookingFormValues>({
+    resolver: zodResolver(bookingFormSchema),
+  });
+
+  const pickupQuery = form.watch('pickupLocation');
+  const dropoffQuery = form.watch('dropoffLocation');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (pickupQuery && showPickupSuggestions) {
+        getPlacePredictions(pickupQuery).then(setPickupSuggestions);
+      } else {
+        setPickupSuggestions([]);
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [pickupQuery, showPickupSuggestions]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (dropoffQuery && showDropoffSuggestions) {
+        getPlacePredictions(dropoffQuery).then(setDropoffSuggestions);
+      } else {
+        setDropoffSuggestions([]);
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [dropoffQuery, showDropoffSuggestions]);
+
+  useEffect(() => {
+    if (booking) {
+      form.reset({
+        ...booking,
+        scheduledDate: new Date(booking.scheduledDate + 'T00:00:00'),
+        fare: booking.fare / 100, // Convert from cents to dollars
+        clientPhone: booking.clientPhone || undefined,
+        dropoffLocation: booking.dropoffLocation || '',
+      });
+    }
+  }, [booking, form]);
+
+  async function onSubmit(data: BookingFormValues) {
+    if (!booking) return;
+    try {
+      await updateBooking(booking.id, {
+        ...booking,
+        ...data,
+        scheduledDate: format(data.scheduledDate, 'yyyy-MM-dd'),
+        fare: Math.round(data.fare * 100), // Convert dollars to cents
+        clientPhone: data.clientPhone || null,
+        dropoffLocation: data.dropoffLocation || null,
+      });
+      toast({
+        title: "Booking Updated",
+        description: `Booking for ${data.clientName} has been successfully updated.`,
+      });
+      onOpenChange(false);
+    } catch (error) {
+       toast({
+        title: "Update Failed",
+        description: "Could not update the booking. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="font-headline">Edit Booking</DialogTitle>
+          <DialogDescription>
+            Make changes to the booking for {booking?.clientName}. Click save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField control={form.control} name="clientName" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Client Name</FormLabel>
+                  <FormControl><Input {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+            )} />
+            <FormField control={form.control} name="pickupLocation" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Pickup Location</FormLabel>
+                <div className="relative">
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      onFocus={() => setShowPickupSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowPickupSuggestions(false), 200)}
+                      autoComplete="off"
+                    />
+                  </FormControl>
+                  {showPickupSuggestions && pickupSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full bg-card border border-border rounded-md mt-1 shadow-lg max-h-48 overflow-y-auto">
+                      {pickupSuggestions.map((suggestion, index) => (
+                        <div
+                          key={index}
+                          className="p-2 hover:bg-accent cursor-pointer text-sm"
+                          onMouseDown={() => {
+                            form.setValue("pickupLocation", suggestion, { shouldValidate: true });
+                            setPickupSuggestions([]);
+                          }}
+                        >
+                          {suggestion}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <FormField control={form.control} name="dropoffLocation" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dropoff Location</FormLabel>
+                 <div className="relative">
+                  <FormControl>
+                    <Input 
+                      {...field}
+                      onFocus={() => setShowDropoffSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowDropoffSuggestions(false), 200)}
+                      autoComplete="off"
+                    />
+                  </FormControl>
+                  {showDropoffSuggestions && dropoffSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full bg-card border border-border rounded-md mt-1 shadow-lg max-h-48 overflow-y-auto">
+                      {dropoffSuggestions.map((suggestion, index) => (
+                        <div
+                          key={index}
+                          className="p-2 hover:bg-accent cursor-pointer text-sm"
+                          onMouseDown={() => {
+                            form.setValue("dropoffLocation", suggestion, { shouldValidate: true });
+                            setDropoffSuggestions([]);
+                          }}
+                        >
+                          {suggestion}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )} />
+             <div className="grid grid-cols-2 gap-4">
+              <FormField control={form.control} name="scheduledDate" render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+                          {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="scheduledTime" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time</FormLabel>
+                  <FormControl><Input type="time" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
+             <FormField control={form.control} name="fare" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fare</FormLabel>
+                <FormControl><Input type="number" step="0.01" {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}
