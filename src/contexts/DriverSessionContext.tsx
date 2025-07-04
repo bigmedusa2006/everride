@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { ReactNode } from 'react';
@@ -243,6 +244,7 @@ type DriverSessionContextType = {
   dispatch: React.Dispatch<Action>;
   startLiveTrip: () => void;
   endShift: () => void;
+  getGoalEta: () => string;
 };
 
 const DriverSessionContext = createContext<DriverSessionContextType | undefined>(undefined);
@@ -256,10 +258,45 @@ export function DriverSessionProvider({ children }: { children: ReactNode }) {
   
   const endShift = () => {
     dispatch({ type: 'END_SHIFT' });
-  }
+  };
+
+  const getGoalEta = () => {
+    if (!state.isShiftActive || !state.shiftStartTime || state.dailyGoal <= 0) {
+      return '--';
+    }
+
+    const netEarnings = state.totalEarningsThisShift - state.totalExpensesThisShift;
+    if (netEarnings >= state.dailyGoal) {
+      return 'Achieved';
+    }
+
+    const tripCount = state.currentTrips.length;
+    if (tripCount === 0) {
+        return 'Calculating...';
+    }
+
+    const remainingToGoal = state.dailyGoal - netEarnings;
+    const totalEarnings = state.totalEarningsThisShift;
+    const averageTripValue = totalEarnings / tripCount;
+    const tripsToGoal = Math.ceil(remainingToGoal / averageTripValue);
+
+    const shiftDurationHours = (Date.now() - state.shiftStartTime) / (1000 * 60 * 60);
+    const averageTimePerTripMinutes = shiftDurationHours > 0 ? (shiftDurationHours * 60) / tripCount : 45; // Default 45 mins
+    
+    const etaMinutes = tripsToGoal * averageTimePerTripMinutes;
+
+    if (etaMinutes > 60 * 24) { // Cap at 24 hours for sanity
+        return '>24h';
+    }
+
+    const etaHours = Math.floor(etaMinutes / 60);
+    const etaRemainingMinutes = Math.round(etaMinutes % 60);
+
+    return `${etaHours}h ${etaRemainingMinutes}m`;
+  };
 
   return (
-    <DriverSessionContext.Provider value={{ state, dispatch, startLiveTrip, endShift }}>
+    <DriverSessionContext.Provider value={{ state, dispatch, startLiveTrip, endShift, getGoalEta }}>
       {children}
     </DriverSessionContext.Provider>
   );
