@@ -2,7 +2,7 @@
 'use client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Copy, Car, Timer, Receipt, TrendingUp, Clock, DollarSign, Target } from "lucide-react";
+import { AlertTriangle, Copy, DollarSign, Target, TrendingUp, Timer } from "lucide-react";
 import { useDriverSession } from "@/contexts/DriverSessionContext";
 import { useShiftTimer } from "@/hooks/useShiftTimer";
 import { useState } from "react";
@@ -106,23 +106,23 @@ GOAL
             {/* Earnings */}
             <div className="space-y-2 rounded-lg border p-3">
                 <h4 className="font-semibold text-sm flex items-center gap-2"><DollarSign className="h-4 w-4"/>Earnings</h4>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Gross Earnings</span> <span>${totalEarnings.toFixed(2)}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Expenses</span> <span className="text-destructive">-${totalExpenses.toFixed(2)}</span></div>
-                <div className="flex justify-between text-base font-bold"><span className="">Net Earnings</span> <span>${netEarnings.toFixed(2)}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Gross Earnings</span> <span>$${totalEarnings.toFixed(2)}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Expenses</span> <span className="text-destructive">-$${totalExpenses.toFixed(2)}</span></div>
+                <div className="flex justify-between text-base font-bold"><span className="">Net Earnings</span> <span>$${netEarnings.toFixed(2)}</span></div>
             </div>
 
             {/* Performance */}
             <div className="space-y-2 rounded-lg border p-3">
                 <h4 className="font-semibold text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4"/>Performance</h4>
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Total Trips</span> <span>{tripCount}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Net Hourly Rate</span> <span>${hourlyRate.toFixed(2)}/hr</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Net Hourly Rate</span> <span>$${hourlyRate.toFixed(2)}/hr</span></div>
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Efficiency</span> <span>{efficiency.toFixed(1)}%</span></div>
             </div>
              {/* Target */}
             <div className="space-y-2 rounded-lg border p-3">
                 <h4 className="font-semibold text-sm flex items-center gap-2"><Target className="h-4 w-4"/>Daily Target</h4>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Goal</span> <span>${state.dailyGoal.toFixed(2)}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Net Earnings</span> <span>${netEarnings.toFixed(2)}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Goal</span> <span>$${state.dailyGoal.toFixed(2)}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Net Earnings</span> <span>$${netEarnings.toFixed(2)}</span></div>
                 <div className="flex justify-between text-base font-bold"><span className="">Progress</span> <span className={`${targetProgress >= 100 ? 'text-green-500':'text-foreground'}`}>{targetProgress.toFixed(1)}%</span></div>
             </div>
         </div>

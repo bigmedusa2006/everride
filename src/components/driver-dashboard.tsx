@@ -1,88 +1,50 @@
 
 'use client';
 import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
   Car, 
   Timer, 
   DollarSign, 
-  Ban,
   Power,
   LocateFixed,
-  Wallet,
-  BarChart2,
-  Zap,
-  Wrench, 
   TrendingUp,
-  CircleDollarSign,
   Clock,
   Plus,
-  PlusCircle,
-  Trash2,
   Target,
-  AlertTriangle,
-  MapPin,
   Route,
-  QrCode,
-  X,
-  Circle,
   LayoutDashboard,
   Calendar,
   Receipt,
   Settings,
   HelpCircle,
-  FileText
 } from "lucide-react"
 import { useDriverSession } from "@/contexts/DriverSessionContext"
 import { ThemeSettings, QuickThemeToggle } from "@/components/core/ThemeSettings"
 import { UserGuide } from "@/components/core/UserGuide"
 import { NotificationSettings } from "@/components/core/NotificationSettings"
-
-
 import { ShiftConfigDialog, type ShiftConfig } from "@/components/shifts/ShiftConfigDialog"
 import { ShiftExtensionDialog } from "@/components/shifts/ShiftExtensionDialog"
 import { EndShiftConfirmDialog } from "@/components/shifts/EndShiftConfirmDialog"
 import { NewTripCompletionDialog } from "@/components/trips/NewTripCompletionDialog"
-
 import { OverviewCard } from "@/components/core/charts/OverviewCard"
 import RecentExpensesCard from "@/components/expenses/RecentExpensesCard"
 import TripLogCard from "@/components/trips/TripLogCard"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-import { ExpenseCategoryDropdown } from "@/components/core/forms/ExpenseCategoryDropdown"
 import { PrivateBookingsCard } from "@/components/bookings/Reservations"
-import { RecordedFareCard } from "@/components/trips/RecordedFareCard"
-import { VCard } from "@/components/business/VCard"
-
 import { ExpenseTrackerCard } from "@/components/expenses/ExpenseTrackerCard" 
 import { PickupReminderNotification } from "@/components/notifications/PickupReminderNotification"
 import { MilestoneNotifier } from '@/components/notifications/MilestoneNotifier';
-
 import { formatTime } from "@/lib/formatTime"
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
-
 import { ShiftAnalyticsModal } from "@/components/shifts/ShiftAnalyticsModal"
-import { EarningsDataTable } from '@/components/earnings/EarningsDataTable'
 import { EarningsHistoryCard } from '@/components/earnings/EarningsHistoryCard'
-import { useBookingStore } from '@/stores/bookingStore';
-import { WidgetCustomizer } from '@/components/widgets/WidgetCustomizer';
-import { WidgetWrapper } from '@/components/widgets/WidgetWrapper';
-import { CreateBookingWidget } from '@/components/widgets/CreateBookingWidget';
-import { QuickActionsWidget } from '@/components/widgets/QuickActionsWidget';
-import { BusinessSettingsWidget } from '@/components/business/VCardSettingsWidget';
 import { useShiftTimer } from '@/hooks/useShiftTimer';
-import { ThemeToggle } from "@/components/theme-toggle";
 
 
-// ... Component implementation will be added here
 export function DriverDashboard() {
   const { 
     state, 
@@ -115,7 +77,6 @@ export function DriverDashboard() {
   const [showShiftConfig, setShowShiftConfig] = useState(false)
   const [showEndShiftConfirm, setShowEndShiftConfirm] = useState(false)
   const [showShiftAnalytics, setShowShiftAnalytics] = useState(false)
-
   const [showFareEntry, setShowFareEntry] = useState(false)
 
   // Timer state

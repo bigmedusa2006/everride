@@ -80,9 +80,7 @@ export function BookingWebsite() {
         setEstimatedFare(data.fareEstimate);
         setDistanceText(data.distanceText);
         setDurationText(data.durationText);
-        console.log(`🚗 Fare calculated: ${data.distanceText}, ${data.durationText}, $${data.fareEstimate} (${data.source})`);
       } else {
-        console.error("Distance Matrix API failed:", response.status);
         setEstimatedFare(45);
         setDistanceText("~15 km");
         setDurationText("~25 min");

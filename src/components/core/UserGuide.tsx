@@ -18,15 +18,6 @@ import {
   Phone, 
   MessageCircle,
   BarChart3,
-  Plus,
-  Play,
-  Square,
-  Power,
-  Calculator,
-  FileText,
-  Smartphone,
-  Zap,
-  Shield,
   HelpCircle
 } from 'lucide-react';
 
@@ -82,7 +73,6 @@ export function UserGuide() {
           <div className="space-y-3">
             <div>
               <h4 className="font-semibold flex items-center gap-2 mb-2">
-                <Play className="h-3 w-3 text-green-600" />
                 Starting a Shift
               </h4>
               <p className="text-muted-foreground mb-2">Click "Start Shift" and select your planned duration:</p>
@@ -96,7 +86,6 @@ export function UserGuide() {
 
             <div>
               <h4 className="font-semibold flex items-center gap-2 mb-2">
-                <Square className="h-3 w-3 text-red-600" />
                 Ending a Shift
               </h4>
               <p className="text-muted-foreground text-xs">
@@ -321,7 +310,7 @@ export function UserGuide() {
     {
       id: 'mobile',
       title: 'Mobile Optimization',
-      icon: <Smartphone className="h-4 w-4" />,
+      icon: <Car className="h-4 w-4" />,
       badge: 'PWA Ready',
       content: (
         <div className="space-y-4 text-sm">
@@ -358,7 +347,7 @@ export function UserGuide() {
     {
       id: 'tips',
       title: 'Pro Tips & Best Practices',
-      icon: <Zap className="h-4 w-4" />,
+      icon: <Car className="h-4 w-4" />,
       badge: 'Expert',
       content: (
         <div className="space-y-4 text-sm">
@@ -497,7 +486,7 @@ export function UserGuide() {
 
       <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800">
         <CardContent className="p-6 text-center">
-          <Shield className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+          <MessageCircle className="h-8 w-8 text-blue-600 mx-auto mb-3" />
           <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 mb-2">
             Need Additional Help?
           </h3>
@@ -510,7 +499,7 @@ export function UserGuide() {
               Contact Support
             </Button>
             <Button variant="outline" size="sm" className="gap-2">
-              <FileText className="h-3 w-3" />
+              <MessageCircle className="h-3 w-3" />
               Report Issue
             </Button>
           </div>

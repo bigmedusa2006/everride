@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RefreshCw, Play, Music } from 'lucide-react';
+import { RefreshCw, Play } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const soundOptions = [
@@ -40,7 +40,6 @@ export function SoundSettings() {
     };
 
     const playSound = (sound: string) => {
-        console.log(`Playing sound: ${sound}`);
         const audio = new Audio(`/sounds/${sound}.mp3`);
         audio.play().catch(e => console.error("Error playing sound:", e));
     };

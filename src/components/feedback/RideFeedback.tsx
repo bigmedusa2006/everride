@@ -15,7 +15,7 @@ export function RideFeedback({ bookingId, open, onOpenChange, onSubmitted }: Rid
     const [feedback, setFeedback] = useState('');
 
     const handleSubmit = () => {
-        console.log(`Feedback for booking ${bookingId}: ${feedback}`);
+        // In a real app, you would send this to your backend
         onSubmitted();
     };
 

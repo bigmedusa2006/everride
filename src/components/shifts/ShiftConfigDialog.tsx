@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { X, Check } from "lucide-react"
+import { X } from "lucide-react"
 
 export interface ShiftConfig {
   plannedDurationHours: number
@@ -70,11 +70,11 @@ export function ShiftConfigDialog({ open, onOpenChange, onStartShift }: ShiftCon
             <div className="text-xs font-medium text-primary mb-2">BC Commercial Rules:</div>
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-xs text-primary/90">
-                <Check className="w-3 h-3 text-accent flex-shrink-0" />
+                <span className="w-3 h-3 text-accent flex-shrink-0">•</span>
                 Max 13h driving in 14h window
               </div>
               <div className="flex items-center gap-2 text-xs text-primary/90">
-                <Check className="w-3 h-3 text-accent flex-shrink-0" />
+                <span className="w-3 h-3 text-accent flex-shrink-0">•</span>
                 8h rest required after shift
               </div>
             </div>
