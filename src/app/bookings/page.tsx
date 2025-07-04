@@ -1,21 +1,12 @@
+
 import { AppShell } from '@/components/app-shell';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PrivateBookingsCard } from '@/components/bookings/Reservations';
 
 export default function BookingsPage() {
   return (
     <AppShell title="Reservations">
       <div className="flex-1 space-y-4 p-4 sm:p-8 pt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>My Reservations</CardTitle>
-            <CardDescription>
-              Manage your private reservations and client information.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Reservation management will be implemented here.</p>
-          </CardContent>
-        </Card>
+        <PrivateBookingsCard />
       </div>
     </AppShell>
   );
