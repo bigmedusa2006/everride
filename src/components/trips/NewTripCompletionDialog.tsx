@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, DollarSign, MapPin, User, Car, Timer, Calculator } from "lucide-react";
 import { useBookingStore } from '@/stores/bookingStore';
+import { useDriverSession } from '@/contexts/DriverSessionContext';
 import { useToast } from '@/hooks/use-toast';
 import type { Booking } from '@shared/schema';
 import { RideFeedback } from '@/components/feedback/RideFeedback';
@@ -24,6 +25,7 @@ export function NewTripCompletionDialog({
   booking = null
 }: NewTripCompletionDialogProps) {
   const { completeBooking } = useBookingStore();
+  const { state: sessionState, dispatch: sessionDispatch } = useDriverSession();
   const { toast } = useToast();
 
   const [fareAmount, setFareAmount] = useState('');
@@ -37,10 +39,12 @@ export function NewTripCompletionDialog({
     if (open) {
       setShowFeedback(false);
       if (booking) {
+        // Came from a pre-scheduled booking
         const bookingFare = booking.fare;
         setFareAmount(bookingFare.toFixed(2));
         setTipAmount('0');
       } else {
+        // Came from a live trip
         setFareAmount('');
         setTipAmount('0');
       }
@@ -71,25 +75,36 @@ export function NewTripCompletionDialog({
 
     try {
       if (booking) {
+        // Complete a pre-scheduled booking
         await completeBooking(booking.id, { fare, tip });
         setCompletedBookingId(booking.id);
+        toast({
+          title: "Reservation Confirmed",
+          description: `Fare: $${fare.toFixed(2)}, Tip: $${tip.toFixed(2)}, Total: $${total.toFixed(2)}`,
+        });
+        if (booking) {
+          setTimeout(() => setShowFeedback(true), 300);
+        }
+      } else {
+        // Complete a live trip from the dashboard
+        const tripDuration = sessionState.currentTripStartTime ? (Date.now() - sessionState.currentTripStartTime) / 1000 : 0;
+        sessionDispatch({
+          type: 'END_TRIP',
+          payload: { fare, tip, durationSeconds: tripDuration },
+        });
+        toast({
+          title: "Trip Completed",
+          description: `Logged earnings of $${total.toFixed(2)}`,
+        });
       }
-
-      toast({
-        title: "Reservation Confirmed",
-        description: `Fare: $${fare.toFixed(2)}, Tip: $${tip.toFixed(2)}, Total: $${total.toFixed(2)}`,
-      });
-
-      onOpenChange(false);
       
-      if (booking) {
-        setTimeout(() => setShowFeedback(true), 300);
-      }
+      onOpenChange(false);
+
     } catch (error) {
-      console.error('Error confirming reservation:', error);
+      console.error('Error confirming trip/reservation:', error);
       toast({
         title: "Error",
-        description: "Failed to confirm reservation. Please try again.",
+        description: "Failed to confirm. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -98,6 +113,7 @@ export function NewTripCompletionDialog({
   };
 
   const totalAmount = (parseFloat(fareAmount) || 0) + (parseFloat(tipAmount) || 0);
+  const isLiveTrip = !booking;
 
   return (
     <>
@@ -106,7 +122,7 @@ export function NewTripCompletionDialog({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Calculator className="h-5 w-5" />
-              Complete Trip
+              {isLiveTrip ? 'Complete Live Trip' : 'Complete Booking'}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {booking ? (
@@ -114,10 +130,6 @@ export function NewTripCompletionDialog({
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4" />
                     <span>{booking.clientName}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Car className="h-4 w-4" />
-                    <Badge variant="secondary" className="text-xs">Private Booking</Badge>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <MapPin className="h-3 w-3" />
@@ -192,7 +204,7 @@ export function NewTripCompletionDialog({
                     <span>Tip:</span>
                     <span className="font-mono">${(parseFloat(tipAmount) || 0).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between font-semibold text-lg border-t pt-2">
+                  <div className="flex justify-between font-semibold text-lg border-t pt-2 mt-2">
                     <span>Total Earnings:</span>
                     <span className="font-mono text-green-600">${totalAmount.toFixed(2)}</span>
                   </div>

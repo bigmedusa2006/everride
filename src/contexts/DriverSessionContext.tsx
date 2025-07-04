@@ -6,6 +6,7 @@ import { createContext, useContext, useReducer } from 'react';
 export type Trip = {
   fare: number;
   tip: number;
+  durationSeconds: number;
 };
 
 export type Expense = {
@@ -24,6 +25,8 @@ type State = {
   currentTrips: Trip[];
   currentExpenses: Expense[];
   totalEarningTimeSeconds: number;
+  totalEarningsThisShift: number;
+  totalExpensesThisShift: number;
   shiftExtensionOffered: boolean;
   driverName: string;
   // New properties for advanced timer and state management
@@ -57,6 +60,8 @@ const initialState: State = {
   currentTrips: [],
   currentExpenses: [],
   totalEarningTimeSeconds: 0,
+  totalEarningsThisShift: 0,
+  totalExpensesThisShift: 0,
   shiftExtensionOffered: false,
   driverName: 'Driver',
   // New properties
@@ -90,9 +95,14 @@ function sessionReducer(state: State, action: Action): State {
         currentTripStartTime: null,
         currentTrips: [...state.currentTrips, action.payload],
         totalEarningTimeSeconds: state.totalEarningTimeSeconds + tripDuration,
+        totalEarningsThisShift: state.totalEarningsThisShift + action.payload.fare + action.payload.tip,
       };
     case 'ADD_EXPENSE':
-      return { ...state, currentExpenses: [...state.currentExpenses, action.payload] };
+      return { 
+        ...state, 
+        currentExpenses: [...state.currentExpenses, action.payload],
+        totalExpensesThisShift: state.totalExpensesThisShift + action.payload.amount,
+      };
     case 'SET_DAILY_GOAL':
       return { ...state, dailyGoal: action.payload.goal };
     case 'OFFER_EXTENSION':
