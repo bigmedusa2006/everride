@@ -19,8 +19,11 @@ export type Trip = {
 };
 
 export type Expense = {
+  id: string;
   amount: number;
   category: string;
+  description: string;
+  timestamp: number;
 };
 
 export type ShiftSummaryData = {
@@ -70,6 +73,7 @@ type Action =
   | { type: 'REMOVE_TRIP'; payload: string } // tripId
   | { type: 'UPDATE_TRIP'; payload: Trip }
   | { type: 'ADD_EXPENSE'; payload: Expense }
+  | { type: 'REMOVE_EXPENSE'; payload: string } // expenseId
   | { type: 'SET_DAILY_GOAL'; payload: { goal: number } }
   | { type: 'OFFER_EXTENSION' }
   | { type: 'DECLINE_EXTENSION' }
@@ -164,6 +168,7 @@ function sessionReducer(state: State, action: Action): State {
             designationType: 'platform',
             pickupLocation: action.payload.pickupLocation || 'Live Trip',
             dropoffLocation: action.payload.dropoffLocation || 'N/A',
+            notes: '',
             ...action.payload,
         };
         return {
@@ -208,6 +213,16 @@ function sessionReducer(state: State, action: Action): State {
         currentExpenses: [...state.currentExpenses, action.payload],
         totalExpensesThisShift: state.totalExpensesThisShift + action.payload.amount,
       };
+    case 'REMOVE_EXPENSE': {
+      const expenseToRemove = state.currentExpenses.find(e => e.id === action.payload);
+      if (!expenseToRemove) return state;
+
+      return {
+        ...state,
+        currentExpenses: state.currentExpenses.filter(e => e.id !== action.payload),
+        totalExpensesThisShift: state.totalExpensesThisShift - expenseToRemove.amount,
+      };
+    }
     case 'SET_DAILY_GOAL':
       return { ...state, dailyGoal: action.payload.goal };
     case 'OFFER_EXTENSION':
@@ -252,6 +267,7 @@ type DriverSessionContextType = {
   startLiveTrip: () => void;
   endShift: () => void;
   getGoalEta: () => string;
+  removeExpense: (expenseId: string) => void;
 };
 
 const DriverSessionContext = createContext<DriverSessionContextType | undefined>(undefined);
@@ -265,6 +281,10 @@ export function DriverSessionProvider({ children }: { children: ReactNode }) {
   
   const endShift = () => {
     dispatch({ type: 'END_SHIFT' });
+  };
+
+  const removeExpense = (expenseId: string) => {
+    dispatch({ type: 'REMOVE_EXPENSE', payload: expenseId });
   };
 
   const getGoalEta = () => {
@@ -303,7 +323,7 @@ export function DriverSessionProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <DriverSessionContext.Provider value={{ state, dispatch, startLiveTrip, endShift, getGoalEta }}>
+    <DriverSessionContext.Provider value={{ state, dispatch, startLiveTrip, endShift, getGoalEta, removeExpense }}>
       {children}
     </DriverSessionContext.Provider>
   );
