@@ -9,9 +9,13 @@ export type Trip = {
   id: string;
   fare: number;
   tip: number;
-  durationSeconds: number;
   startTime: number;
+  endTime?: number;
+  durationSeconds: number;
   designationType: 'prime' | 'platform';
+  pickupLocation?: string;
+  dropoffLocation?: string;
+  notes?: string;
 };
 
 export type Expense = {
@@ -61,7 +65,7 @@ type Action =
   | { type: 'START_SHIFT'; payload: { startTime: number; dailyGoal: number; durationHours: number; driverName: string } }
   | { type: 'END_SHIFT' }
   | { type: 'START_TRIP' }
-  | { type: 'END_TRIP'; payload: { fare: number; tip: number; durationSeconds: number; } }
+  | { type: 'END_TRIP'; payload: { fare: number; tip: number; durationSeconds: number; pickupLocation?: string; dropoffLocation?: string; } }
   | { type: 'ADD_COMPLETED_TRIP'; payload: Trip }
   | { type: 'REMOVE_TRIP'; payload: string } // tripId
   | { type: 'UPDATE_TRIP'; payload: Trip }
@@ -156,7 +160,10 @@ function sessionReducer(state: State, action: Action): State {
         const newTrip: Trip = {
             id: crypto.randomUUID(),
             startTime: state.currentTripStartTime,
+            endTime: Date.now(),
             designationType: 'platform',
+            pickupLocation: action.payload.pickupLocation || 'Live Trip',
+            dropoffLocation: action.payload.dropoffLocation || 'N/A',
             ...action.payload,
         };
         return {

@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -78,14 +79,17 @@ export function NewTripCompletionDialog({
         // Complete a pre-scheduled booking
         await completeBooking(booking.id, { fare, tip });
         
-        // Also add to the current shift's trip log
         const newTripPayload: Trip = {
             id: booking.id,
             fare: fare,
             tip: tip,
-            durationSeconds: 0, // Booked trips don't have a live-tracked duration
             startTime: new Date(`${booking.scheduledDate} ${booking.scheduledTime}`).getTime(),
-            designationType: 'prime'
+            endTime: Date.now(),
+            durationSeconds: 0, // Booked trips don't have a live-tracked duration
+            designationType: 'prime',
+            pickupLocation: booking.pickupLocation,
+            dropoffLocation: booking.dropoffLocation,
+            notes: booking.notes
         };
         sessionDispatch({ type: 'ADD_COMPLETED_TRIP', payload: newTripPayload });
 
@@ -102,7 +106,7 @@ export function NewTripCompletionDialog({
         const tripDuration = sessionState.currentTripStartTime ? (Date.now() - sessionState.currentTripStartTime) / 1000 : 0;
         sessionDispatch({
           type: 'END_TRIP',
-          payload: { fare, tip, durationSeconds: tripDuration },
+          payload: { fare, tip, durationSeconds: tripDuration, pickupLocation: "Live Trip", dropoffLocation: "N/A" },
         });
         toast({
           title: "Trip Completed",
