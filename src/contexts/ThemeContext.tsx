@@ -26,7 +26,7 @@ type ThemeState = {
   isDarkMode: boolean;
   setColor: (color: string) => void;
   setRadius: (radius: string) => void;
-  toggleDarkMode: () => void;
+  setTheme: (theme: string) => void;
 };
 
 const ThemeContext = createContext<ThemeState | undefined>(undefined);
@@ -78,10 +78,6 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const toggleDarkMode = () => {
-    setTheme(mode === 'dark' ? 'light' : 'dark');
-  };
-
   const isDarkMode = mode === 'dark';
 
   const value = useMemo(() => ({
@@ -90,8 +86,8 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
     isDarkMode,
     setColor,
     setRadius,
-    toggleDarkMode,
-  }), [color, radius, isDarkMode, mode, setColor, setRadius, toggleDarkMode]);
+    setTheme,
+  }), [color, radius, isDarkMode, setColor, setRadius, setTheme]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

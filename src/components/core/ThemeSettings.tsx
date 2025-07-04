@@ -6,7 +6,7 @@ import { useTheme, COLOR_OPTIONS, RADIUS_OPTIONS } from '@/contexts/ThemeContext
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 export function ThemeSettings() {
-  const { currentColor, currentRadius, isDarkMode, setColor, setRadius, toggleDarkMode } = useTheme();
+  const { currentColor, currentRadius, isDarkMode, setColor, setRadius, setTheme } = useTheme();
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
@@ -76,7 +76,7 @@ export function ThemeSettings() {
               variant={!isDarkMode ? "default" : "outline"}
               size="sm"
               className="flex items-center gap-2 h-8 px-3"
-              onClick={() => !isDarkMode && toggleDarkMode()}
+              onClick={() => setTheme('light')}
             >
               <Sun className="h-3 w-3" />
               <span className="text-xs">Light</span>
@@ -85,7 +85,7 @@ export function ThemeSettings() {
               variant={isDarkMode ? "default" : "outline"}
               size="sm"
               className="flex items-center gap-2 h-8 px-3"
-              onClick={() => isDarkMode || toggleDarkMode()}
+              onClick={() => setTheme('dark')}
             >
               <Moon className="h-3 w-3" />
               <span className="text-xs">Dark</span>
@@ -99,11 +99,15 @@ export function ThemeSettings() {
 
 // Quick theme toggle for main dashboard
 export function QuickThemeToggle({ asIcon = false }: { asIcon?: boolean }) {
-  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { isDarkMode, setTheme } = useTheme();
+
+  const toggle = () => {
+    setTheme(isDarkMode ? 'light' : 'dark');
+  };
 
   if (asIcon) {
     return (
-      <span onClick={toggleDarkMode} className="cursor-pointer">
+      <span onClick={toggle} className="cursor-pointer">
         {isDarkMode ? (
           <Sun className="h-4 w-4" />
         ) : (
@@ -117,7 +121,7 @@ export function QuickThemeToggle({ asIcon = false }: { asIcon?: boolean }) {
     <Button
       variant="ghost"
       size="sm"
-      onClick={toggleDarkMode}
+      onClick={toggle}
       className="h-8 w-8 px-0"
     >
       {isDarkMode ? (
