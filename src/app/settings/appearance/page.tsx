@@ -1,52 +1,98 @@
-
 'use client';
-import { AppShell } from '@/components/app-shell';
-import { ThemeToggle } from '@/components/theme-toggle';
+
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RefreshCw, Play, Music } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 
-export default function AppearanceSettingsPage() {
-  const accentColors = [
-    { name: 'Teal', color: 'hsl(180, 100%, 25%)' },
-    { name: 'Indigo', color: 'hsl(275, 100%, 25%)' },
-    { name: 'Rose', color: 'hsl(346.8, 77.2%, 49.8%)' },
-    { name: 'Amber', color: 'hsl(45, 93%, 47%)' },
-    { name: 'Violet', color: 'hsl(262.1, 83.3%, 57.8%)' },
-  ];
+const soundOptions = [
+    { label: 'Chime', value: 'chime' },
+    { label: 'Alert', value: 'alert' },
+    { label: 'Success', value: 'success' },
+    { label: 'Complete', value: 'complete' },
+    { label: 'Click', value: 'click' },
+    { label: 'Error', value: 'error' },
+];
 
-  return (
-    <AppShell title="Appearance Settings">
-      <div className="flex-1 space-y-4 p-4 sm:p-8 pt-6">
+const notificationSounds = [
+    { id: 'pickup-reminder', label: 'Pickup Reminder', defaultSound: 'chime' },
+    { id: 'shift-alert', label: 'Shift Alert', defaultSound: 'alert' },
+    { id: 'performance-milestone', label: 'Performance Milestone', defaultSound: 'success' },
+    { id: 'trip-complete', label: 'Trip Complete', defaultSound: 'complete' },
+    { id: 'booking-confirmation', label: 'Booking Confirmation', defaultSound: 'success' },
+    { id: 'button-tap', label: 'Button Tap', defaultSound: 'click' },
+    { id: 'error-alert', label: 'Error Alert', defaultSound: 'error' },
+    { id: 'success-notification', label: 'Success Notification', defaultSound: 'success' },
+];
+
+export function SoundSettings() {
+    const [selectedSounds, setSelectedSounds] = useState(() => 
+        Object.fromEntries(notificationSounds.map(s => [s.id, s.defaultSound]))
+    );
+
+    const handleSoundChange = (id: string, value: string) => {
+        setSelectedSounds(prev => ({ ...prev, [id]: value }));
+    };
+    
+    const handleResetAll = () => {
+        setSelectedSounds(Object.fromEntries(notificationSounds.map(s => [s.id, s.defaultSound])));
+    };
+
+    const playSound = (sound: string) => {
+        console.log(`Playing sound: ${sound}`);
+        const audio = new Audio(`/sounds/${sound}.mp3`);
+        audio.play().catch(e => console.error("Error playing sound:", e));
+    };
+
+    return (
         <Card>
-          <CardHeader>
-            <CardTitle>Appearance</CardTitle>
-            <CardDescription>
-              Customize the look and feel of your application.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="theme">Theme</Label>
-              <ThemeToggle />
-            </div>
-             <div className="space-y-2">
-              <Label htmlFor="accent-color">Accent Color</Label>
-              <div className="flex flex-wrap gap-2">
-                {accentColors.map((item) => (
-                  <Button
-                    key={item.name}
-                    variant="outline"
-                    className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary"
-                    style={{ backgroundColor: item.color }}
-                    aria-label={`Set accent color to ${item.name}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </CardContent>
+            <CardHeader>
+                <CardTitle>Sound Customization</CardTitle>
+                <CardDescription>Personalize your audio alerts for different in-app events.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="rounded-lg border bg-card p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <RefreshCw className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                                <h3 className="font-semibold text-card-foreground">Reset All Sounds</h3>
+                                <p className="text-sm text-muted-foreground">Revert all sounds to their original settings.</p>
+                            </div>
+                        </div>
+                        <Button onClick={handleResetAll}>Reset</Button>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    {notificationSounds.map((sound) => (
+                        <div key={sound.id} className="flex items-center justify-between rounded-lg border bg-card p-3">
+                             <div>
+                                <h4 className="font-medium text-card-foreground">{sound.label}</h4>
+                                <p className="text-xs text-muted-foreground">Current: {selectedSounds[sound.id]}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Select value={selectedSounds[sound.id]} onValueChange={(value) => handleSoundChange(sound.id, value)}>
+                                    <SelectTrigger className="w-[120px]">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {soundOptions.map(opt => (
+                                            <SelectItem key={opt.value} value={opt.value}>
+                                                {opt.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Button variant="outline" size="icon" onClick={() => playSound(selectedSounds[sound.id])}>
+                                    <Play className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
         </Card>
-      </div>
-    </AppShell>
-  );
+    );
 }

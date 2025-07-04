@@ -2,16 +2,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Clock, Target, Settings, CheckCircle, AlertCircle, Music } from 'lucide-react';
+import { Bell, Clock, Target, CheckCircle, AlertCircle } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
 import { useToast } from '@/hooks/use-toast';
-import Link from 'next/link';
 
 interface NotificationPreferences {
   pickupReminders: boolean;
@@ -47,25 +46,20 @@ export function NotificationSettings() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load saved preferences
     const saved = localStorage.getItem('notificationPreferences');
     if (saved) {
       setPreferences({ ...defaultPreferences, ...JSON.parse(saved) });
     }
 
-    // Check notification permission
     if ('Notification' in window) {
       setNotificationPermission(Notification.permission);
     }
-
-    // Initialize notification service
     notificationService.initialize();
   }, []);
 
   const savePreferences = (newPreferences: NotificationPreferences) => {
     setPreferences(newPreferences);
     localStorage.setItem('notificationPreferences', JSON.stringify(newPreferences));
-    
     toast({
       title: "Settings Saved",
       description: "Your notification preferences have been updated.",
@@ -80,10 +74,9 @@ export function NotificationSettings() {
       if (permission === 'granted') {
         const newPreferences = { ...preferences, browserNotifications: true };
         savePreferences(newPreferences);
-        
         toast({
           title: "Notifications Enabled",
-          description: "You'll now receive browser notifications for pickups and shift alerts.",
+          description: "You'll now receive browser notifications.",
         });
       } else {
         toast({
@@ -98,11 +91,10 @@ export function NotificationSettings() {
   const testNotification = () => {
     if (notificationPermission === 'granted') {
       new Notification('Prime Rides Test', {
-        body: 'This is how pickup reminders will appear!',
+        body: 'This is how your notifications will appear!',
         icon: '/logo.png',
         badge: '/logo.png',
       });
-      
       toast({
         title: "Test Notification Sent",
         description: "Check your system notifications!",
@@ -133,48 +125,34 @@ export function NotificationSettings() {
   };
 
   return (
-    <div className="space-y-4 text-sm">
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+    <Card>
+      <CardHeader>
+        <CardTitle>Notifications</CardTitle>
+        <CardDescription>
+          Manage how and when you receive alerts from the application.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Browser Notifications Section */}
+        <div className="space-y-4 rounded-lg border p-4">
+          <h3 className="text-base font-medium flex items-center gap-2">
             <Bell className="h-4 w-4" />
             Browser Notifications
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </h3>
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label className="text-sm font-medium">Permission Status</Label>
-              <p className="text-xs text-muted-foreground">
-                Required for all browser alerts
-              </p>
-            </div>
+            <Label htmlFor="permission-status" className="font-normal text-muted-foreground">Permission Status</Label>
             <div className="flex items-center gap-2">
               <Badge variant={notificationPermission === 'granted' ? 'default' : 'destructive'}>
-                {notificationPermission === 'granted' ? (
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                ) : (
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                )}
+                {notificationPermission === 'granted' ? <CheckCircle className="h-3 w-3 mr-1" /> : <AlertCircle className="h-3 w-3 mr-1" />}
                 {notificationPermission}
               </Badge>
               {notificationPermission !== 'granted' && (
-                <Button size="sm" onClick={requestNotificationPermission}>
-                  Request
-                </Button>
+                <Button size="sm" onClick={requestNotificationPermission}>Request</Button>
               )}
             </div>
           </div>
-
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label htmlFor="browser-notifications" className="text-sm font-medium">
-                Enable All Notifications
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Master switch for system notifications
-              </p>
-            </div>
+            <Label htmlFor="browser-notifications" className="font-normal text-muted-foreground">Enable All System Alerts</Label>
             <Switch
               id="browser-notifications"
               checked={preferences.browserNotifications}
@@ -182,51 +160,25 @@ export function NotificationSettings() {
               disabled={notificationPermission !== 'granted'}
             />
           </div>
-
           <Button size="sm" variant="outline" onClick={testNotification} className="w-full">
             Send Test Notification
           </Button>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Music className="h-4 w-4" />
-            Sound Settings
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-                Personalize the audio alerts for different in-app events to create your ideal work environment.
-            </p>
-            <Button asChild className="w-full">
-                <Link href="/settings/sounds">
-                    Customize Sounds
-                </Link>
-            </Button>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+        {/* Pickup Reminders Section */}
+        <div className="space-y-4 rounded-lg border p-4">
+          <h3 className="text-base font-medium flex items-center gap-2">
             <Clock className="h-4 w-4" />
             Pickup Reminders
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </h3>
           <div className="flex items-center justify-between">
-            <Label htmlFor="pickup-reminders" className="text-sm font-medium">
-              Enable Pickup Reminders
-            </Label>
+            <Label htmlFor="pickup-reminders" className="font-normal text-muted-foreground">Enable Pickup Reminders</Label>
             <Switch
               id="pickup-reminders"
               checked={preferences.pickupReminders}
               onCheckedChange={(checked) => updatePreference('pickupReminders', checked)}
             />
           </div>
-
           {preferences.pickupReminders && (
             <div className="space-y-2">
               <Label className="text-sm font-medium">Reminder Time</Label>
@@ -246,32 +198,26 @@ export function NotificationSettings() {
               </Select>
             </div>
           )}
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+        </div>
+
+        {/* Performance Milestones Section */}
+        <div className="space-y-4 rounded-lg border p-4">
+           <h3 className="text-base font-medium flex items-center gap-2">
             <Target className="h-4 w-4" />
             Performance Milestones
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </h3>
           <div className="flex items-center justify-between">
-            <Label htmlFor="performance-milestones" className="text-sm font-medium">
-              Enable Milestone Notifications
-            </Label>
+            <Label htmlFor="performance-milestones" className="font-normal text-muted-foreground">Enable Milestone Notifications</Label>
             <Switch
               id="performance-milestones"
               checked={preferences.performanceMilestones}
               onCheckedChange={(checked) => updatePreference('performanceMilestones', checked)}
             />
           </div>
-
           {preferences.performanceMilestones && (
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="daily-earnings" className="text-xs">Daily Earnings Goals</Label>
+                <Label htmlFor="daily-earnings" className="text-xs text-muted-foreground">Daily Earnings Goals</Label>
                 <Switch
                   id="daily-earnings"
                   checked={preferences.milestoneTypes.dailyEarnings}
@@ -280,7 +226,7 @@ export function NotificationSettings() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="trip-count" className="text-xs">Trip Count Achievements</Label>
+                <Label htmlFor="trip-count" className="text-xs text-muted-foreground">Trip Count Achievements</Label>
                 <Switch
                   id="trip-count"
                   checked={preferences.milestoneTypes.tripCount}
@@ -289,7 +235,7 @@ export function NotificationSettings() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="hours-worked" className="text-xs">Hours Worked Milestones</Label>
+                <Label htmlFor="hours-worked" className="text-xs text-muted-foreground">Hours Worked Milestones</Label>
                 <Switch
                   id="hours-worked"
                   checked={preferences.milestoneTypes.hoursWorked}
@@ -299,8 +245,8 @@ export function NotificationSettings() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

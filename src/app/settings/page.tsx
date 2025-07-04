@@ -1,54 +1,57 @@
 
+'use client';
 import { AppShell } from '@/components/app-shell';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Link from 'next/link';
-import { ChevronRight, Paintbrush, Bell, Music } from 'lucide-react';
-
-const settingsItems = [
-  {
-    href: '/settings/appearance',
-    title: 'Appearance',
-    description: 'Customize the look and feel of the app.',
-    icon: <Paintbrush className="h-6 w-6" />,
-  },
-  {
-    href: '/settings/notifications',
-    title: 'Notifications',
-    description: 'Manage how and when you receive alerts.',
-    icon: <Bell className="h-6 w-6" />,
-  },
-  {
-    href: '/settings/sounds',
-    title: 'Sound Customization',
-    description: 'Personalize your audio alerts.',
-    icon: <Music className="h-6 w-6" />,
-  },
-];
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { NotificationSettings } from '@/components/core/NotificationSettings';
+import { SoundSettings } from '@/components/settings/SoundSettings';
 
 export default function SettingsPage() {
+  const accentColors = [
+    { name: 'Teal', color: 'hsl(180, 100%, 25%)' },
+    { name: 'Indigo', color: 'hsl(275, 100%, 25%)' },
+    { name: 'Rose', color: 'hsl(346.8, 77.2%, 49.8%)' },
+    { name: 'Amber', color: 'hsl(45, 93%, 47%)' },
+    { name: 'Violet', color: 'hsl(262.1, 83.3%, 57.8%)' },
+  ];
+
   return (
     <AppShell title="Settings">
-      <div className="flex-1 space-y-4 p-4 sm:p-8 pt-6">
-        <div className="grid gap-4 md:grid-cols-2">
-          {settingsItems.map((item) => (
-            <Link href={item.href} key={item.href}>
-              <Card className="hover:bg-muted/50 transition-colors">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-muted rounded-lg">
-                        {item.icon}
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">{item.title}</CardTitle>
-                       <CardDescription>{item.description}</CardDescription>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
-        </div>
+      <div className="flex-1 space-y-8 p-4 sm:p-8 pt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Appearance</CardTitle>
+            <CardDescription>
+              Customize the look and feel of your application.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="theme">Theme</Label>
+              <ThemeToggle />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="accent-color">Accent Color</Label>
+              <div className="flex flex-wrap gap-2">
+                {accentColors.map((item) => (
+                  <Button
+                    key={item.name}
+                    variant="outline"
+                    className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary"
+                    style={{ backgroundColor: item.color }}
+                    aria-label={`Set accent color to ${item.name}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <NotificationSettings />
+        
+        <SoundSettings />
       </div>
     </AppShell>
   );
