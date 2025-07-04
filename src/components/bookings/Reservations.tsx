@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -130,19 +131,19 @@ export function PrivateBookingsCard() {
 
   return (
     <div className="w-full">
-      <Tabs defaultValue="view-bookings" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
-          <TabsTrigger value="create-booking"><Car className="h-4 w-4 mr-2" />Create</TabsTrigger>
-          <TabsTrigger value="view-bookings"><Calendar className="h-4 w-4 mr-2" />Reservations</TabsTrigger>
-          <TabsTrigger value="vcard"><QrCode className="h-4 w-4 mr-2" />vCard</TabsTrigger>
+      <Tabs defaultValue="my-trips" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted">
+          <TabsTrigger value="book" className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"><Car className="h-4 w-4 mr-2" />Book</TabsTrigger>
+          <TabsTrigger value="my-trips" className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"><Calendar className="h-4 w-4 mr-2" />My Trips</TabsTrigger>
+          <TabsTrigger value="qr-vcard" className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"><QrCode className="h-4 w-4 mr-2" />QR vCard</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="vcard" className="mt-0 max-w-md mx-auto">
+        <TabsContent value="qr-vcard" className="mt-0 max-w-md mx-auto">
           <VCard />
         </TabsContent>
 
-        <TabsContent value="view-bookings" className="mt-0 space-y-4">
-          <Card className="w-full relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5 dark:from-primary/10 dark:to-secondary/10 border border-border shadow-lg transition-all duration-500 hover:shadow-xl rounded-2xl">
+        <TabsContent value="my-trips" className="mt-0 space-y-4">
+          <Card className="w-full relative overflow-hidden bg-card/10 border border-border shadow-lg transition-all duration-500 hover:shadow-xl rounded-2xl">
             <div className="absolute -top-16 -left-16 w-40 h-40 bg-gradient-to-br from-accent/20 to-accent/30 dark:from-accent/40 dark:to-accent/50 rounded-full opacity-60"></div>
             <div className="absolute -bottom-16 -right-16 w-32 h-32 bg-gradient-to-br from-accent/20 to-secondary/30 dark:from-accent/40 dark:to-secondary/50 rounded-full opacity-50"></div>
             <CardContent className="p-4 relative z-10">
@@ -253,7 +254,7 @@ export function PrivateBookingsCard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="create-booking" className="mt-0">
+        <TabsContent value="book" className="mt-0">
            <CreateBookingForm />
         </TabsContent>
       </Tabs>
