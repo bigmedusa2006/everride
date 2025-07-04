@@ -128,7 +128,7 @@ export function NewTripCompletionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md w-full p-4 sm:p-6 bg-card border-none shadow-2xl rounded-2xl flex flex-col h-auto">
         <DialogHeader>
-          <DialogTitle className="sr-only">Complete Trip</DialogTitle>
+          <DialogTitle className="text-center text-lg font-semibold">Complete Trip</DialogTitle>
         </DialogHeader>
         {/* Display Screen */}
         <div className="bg-muted/50 rounded-xl p-4 text-right space-y-2">
