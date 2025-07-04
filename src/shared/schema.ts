@@ -1,5 +1,14 @@
+export type BookingStatus = 'scheduled' | 'confirmed' | 'completed' | 'cancelled' | 'no-show';
+
 export type Booking = {
   id: string;
-  status: string;
-  // add other properties as needed
+  clientName: string;
+  clientPhone: string;
+  pickupLocation: string;
+  dropoffLocation: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  fare: number;
+  notes: string;
+  status: BookingStatus;
 };

@@ -174,6 +174,8 @@ export function DriverDashboard() {
       payload: { goal: Math.min(600, Math.max(50, newGoal)) }
     })
   }
+  
+  const { toast } = useToast();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/20 to-secondary/20 dark:from-primary/10 dark:to-secondary/10">
