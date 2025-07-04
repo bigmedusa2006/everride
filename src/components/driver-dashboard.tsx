@@ -1,7 +1,6 @@
-
 'use client';
 import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -45,6 +44,7 @@ import { useDriverSession } from "@/contexts/DriverSessionContext"
 import { ThemeSettings, QuickThemeToggle } from "@/components/core/ThemeSettings"
 import { UserGuide } from "@/components/core/UserGuide"
 import { NotificationSettings } from "@/components/core/NotificationSettings"
+import { SoundSettings } from "@/components/settings/SoundSettings";
 
 
 import { ShiftConfigDialog, type ShiftConfig } from "@/components/shifts/ShiftConfigDialog"
@@ -80,6 +80,7 @@ import { CreateBookingWidget } from '@/components/widgets/CreateBookingWidget';
 import { QuickActionsWidget } from '@/components/widgets/QuickActionsWidget';
 import { BusinessSettingsWidget } from '@/components/business/VCardSettingsWidget';
 import { useShiftTimer } from '@/hooks/useShiftTimer';
+import { ThemeToggle } from "@/components/theme-toggle";
 
 
 // ... Component implementation will be added here
@@ -413,18 +414,35 @@ export function DriverDashboard() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="settings" className="space-y-2 p-2 m-0">
-               <Card className="border border-border bg-card">
-                    <CardHeader className="pb-3 relative z-10">
-                      <CardTitle className="text-card-foreground text-lg font-bold">Settings</CardTitle>
-                       <p className="text-sm text-muted-foreground">All settings have been moved to a dedicated page.</p>
-                    </CardHeader>
-                    <CardContent className="relative z-10 p-4">
-                      <Button asChild className="w-full">
-                        <Link href="/settings">Go to Settings</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
+            <TabsContent value="settings" className="space-y-4 p-2 m-0">
+               <Card>
+                <CardHeader>
+                  <CardTitle>Appearance</CardTitle>
+                  <CardDescription>
+                    Customize the look and feel of your application.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="theme">Theme</Label>
+                    <ThemeToggle />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="accent-color">Accent Color</Label>
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(180, 100%, 25%)' }} aria-label="Set accent color to Teal" />
+                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(275, 100%, 25%)' }} aria-label="Set accent color to Indigo" />
+                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(346.8, 77.2%, 49.8%)' }} aria-label="Set accent color to Rose" />
+                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(45, 93%, 47%)' }} aria-label="Set accent color to Amber" />
+                      <Button variant="outline" className="h-8 w-8 rounded-full p-0 border-2 border-transparent focus:border-primary" style={{ backgroundColor: 'hsl(262.1, 83.3%, 57.8%)' }} aria-label="Set accent color to Violet" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <NotificationSettings />
+              
+              <SoundSettings />
             </TabsContent>
           </div>
         </Tabs>

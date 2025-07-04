@@ -55,11 +55,6 @@ const navItems = [
     label: 'Manual',
     icon: HelpCircle,
   },
-  {
-    href: '/settings',
-    label: 'Settings',
-    icon: Settings,
-  },
 ];
 
 interface AppShellProps {
