@@ -39,12 +39,10 @@ import {
   HelpCircle,
   FileText
 } from "lucide-react"
-import Link from 'next/link';
 import { useDriverSession } from "@/contexts/DriverSessionContext"
 import { ThemeSettings, QuickThemeToggle } from "@/components/core/ThemeSettings"
 import { UserGuide } from "@/components/core/UserGuide"
 import { NotificationSettings } from "@/components/core/NotificationSettings"
-import { SoundSettings } from "@/components/settings/SoundSettings";
 
 
 import { ShiftConfigDialog, type ShiftConfig } from "@/components/shifts/ShiftConfigDialog"
@@ -441,8 +439,6 @@ export function DriverDashboard() {
               </Card>
 
               <NotificationSettings />
-              
-              <SoundSettings />
             </TabsContent>
           </div>
         </Tabs>
