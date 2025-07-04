@@ -167,7 +167,7 @@ export function DriverDashboard() {
                       <>
                         <CardHeader className="pb-3 relative z-10">
                           <div className="text-center mb-2">
-                            <h1 className="text-card-foreground text-lg font-bold">Everride™</h1>
+                            <h1 className="text-card-foreground text-lg font-bold">New RIDE™</h1>
                           </div>
                           <div className="flex justify-center">
                             <Badge className="bg-destructive text-destructive-foreground text-xs rounded-full px-2 py-1">
@@ -190,7 +190,7 @@ export function DriverDashboard() {
                       <>
                         <CardHeader className="pb-3 relative z-10">
                           <div className="text-center mb-2">
-                            <h1 className="text-card-foreground text-lg font-bold">Everride™</h1>
+                            <h1 className="text-card-foreground text-lg font-bold">New RIDE™</h1>
                           </div>
                           <div className="flex justify-center">
                             <Badge className={`${
@@ -359,7 +359,7 @@ export function DriverDashboard() {
             <TabsContent value="manual" className="space-y-4 m-0">
               <Card className="border border-border bg-card">
                 <CardHeader className="pb-3 relative z-10">
-                  <CardTitle className="text-card-foreground text-lg font-bold">Everride™ Manual</CardTitle>
+                  <CardTitle className="text-card-foreground text-lg font-bold">New RIDE™ Manual</CardTitle>
                   <p className="text-sm text-muted-foreground">Complete guide to using your driver dashboard</p>
                 </CardHeader>
                 <CardContent className="relative z-10 p-4">

@@ -11,12 +11,12 @@ const LOCAL_STORAGE_KEY = 'everrideVCardData';
 
 const defaultBusinessInfo = {
   name: 'Biniam',
-  company: 'Everride',
+  company: 'New RIDE',
   tagline: 'Professional Chauffeur Service',
   phone: '+1 (604) 728-1620',
   email: 'bigmedusa2006@gmail.com',
   address: 'Surrey, BC, Canada',
-  bookingUrl: 'https://df586b48-a3b9-430a-8b5c-783b73067c79-00-1mifz0bzjnx0r.spock.replit.dev/book'
+  bookingUrl: 'https://new-ride-4c6a2.web.app/book'
 };
 
 export function VCard() {
@@ -135,7 +135,7 @@ export function VCard() {
           >
             <img
               src={qrCodeUrl}
-              alt="Everride QR Code"
+              alt="New RIDE QR Code"
               width="128"
               height="128"
               className="rounded-lg"
@@ -297,7 +297,7 @@ export function VCard() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <User className="h-4 w-4 text-primary-foreground" />
               </div>
-              Everride QR Code
+              New RIDE QR Code
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
               Scan with your phone to book a ride instantly
@@ -307,7 +307,7 @@ export function VCard() {
             <div className="bg-white p-4 rounded-2xl shadow-lg">
               <img
                 src={qrCodeUrl}
-                alt="Everride QR Code - Enlarged"
+                alt="New RIDE QR Code - Enlarged"
                 width="256"
                 height="256"
                 className="rounded-lg"

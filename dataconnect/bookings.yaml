@@ -1,5 +1,5 @@
 connector:
-  name: everride-connector
+  name: new-ride-connector
   type: sql
   databaseType: postgresql # or mysql if you use MySQL
   datasource: studio  # match your Cloud SQL datasource ID

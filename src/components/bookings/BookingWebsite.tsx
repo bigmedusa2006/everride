@@ -287,7 +287,7 @@ export function BookingWebsite() {
                 <Car className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Everride™</h1>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">New RIDE</h1>
                 <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Professional Transportation</p>
               </div>
             </div>
@@ -666,7 +666,7 @@ export function BookingWebsite() {
           <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 border-indigo-200 dark:border-indigo-800">
             <CardContent className="p-6">
               <div className="text-center mb-6">
-                <h3 className="font-bold text-indigo-700 dark:text-indigo-300 text-lg">Why Choose Everride?</h3>
+                <h3 className="font-bold text-indigo-700 dark:text-indigo-300 text-lg">Why Choose New RIDE?</h3>
                 <p className="text-sm text-muted-foreground mt-2">Professional transportation you can trust</p>
               </div>
               <div className="space-y-4">

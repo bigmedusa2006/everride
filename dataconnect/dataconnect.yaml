@@ -1,12 +1,12 @@
 specVersion: "v1"
-serviceId: "everride-db"
+serviceId: "new-ride-db"
 location: "northamerica-northeast1"
 schema:
   source: "./schema"
   datasource:
     postgresql:
-      database: "everride-db"
+      database: "new-ride-db"
       cloudSql:
-        instanceId: "everride-db"
+        instanceId: "new-ride-4c6a2"
       # schemaValidation: "COMPATIBLE"
 connectorDirs: ["./connector"]

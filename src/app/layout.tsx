@@ -6,7 +6,7 @@ import { ThemeProvider as NextThemesProvider } from '@/components/theme-provider
 import { AppThemeProvider } from '@/contexts/ThemeContext';
 
 export const metadata: Metadata = {
-  title: 'Everride',
+  title: 'New RIDE',
   description: 'Your partner for optimizing your driving shifts.',
 };
 
@@ -26,7 +26,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#4B0082" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Everride" />
+        <meta name="apple-mobile-web-app-title" content="New RIDE" />
       </head>
       <body className="font-body antialiased">
         <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
