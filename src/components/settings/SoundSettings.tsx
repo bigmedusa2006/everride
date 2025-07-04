@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RefreshCw, Play, Music } from 'lucide-react';
+import { RefreshCw, Music } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const soundOptions = [
@@ -38,12 +38,6 @@ export function SoundSettings() {
     
     const handleResetAll = () => {
         setSelectedSounds(Object.fromEntries(notificationSounds.map(s => [s.id, s.defaultSound])));
-    };
-
-    const playSound = (sound: string) => {
-        console.log(`Playing sound: ${sound}`);
-        const audio = new Audio(`/sounds/${sound}.mp3`);
-        audio.play().catch(e => console.error("Error playing sound:", e));
     };
 
     return (
@@ -86,9 +80,6 @@ export function SoundSettings() {
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <Button variant="outline" size="icon" onClick={() => playSound(selectedSounds[sound.id])}>
-                                    <Play className="h-4 w-4" />
-                                </Button>
                             </div>
                         </div>
                     ))}

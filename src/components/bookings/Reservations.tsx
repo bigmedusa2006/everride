@@ -44,13 +44,6 @@ export function PrivateBookingsCard() {
           const pickupTime = new Date(`${booking.scheduledDate} ${booking.scheduledTime}`);
           if (!isNaN(pickupTime.getTime())) {
             notificationService.schedulePickupReminder(booking.id, pickupTime, booking.clientName, booking.pickupLocation);
-
-            // Audio alert shortly before pickup (5 min)
-            const diff = pickupTime.getTime() - new Date().getTime();
-            if (diff > 0 && diff <= 5 * 60 * 1000) { // 5 minutes before
-                const audio = new Audio('/sounds/reminder.mp3');
-                audio.play().catch(e => console.warn('Could not play reminder sound. User interaction may be required.', e));
-            }
           }
         } catch (error) {
           console.error('Error scheduling reminder for booking:', booking.id, error);
