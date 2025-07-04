@@ -41,7 +41,7 @@ import {
   FileText
 } from "lucide-react"
 import { useDriverSession } from "@/contexts/DriverSessionContext"
-import { ThemeSettings } from "@/components/core/ThemeSettings"
+import { ThemeSettings, QuickThemeToggle } from "@/components/core/ThemeSettings"
 import { UserGuide } from "@/components/core/UserGuide"
 import { NotificationSettings } from "@/components/core/NotificationSettings"
 
@@ -63,6 +63,7 @@ import { VCard } from "@/components/business/VCard"
 
 import { ExpenseTrackerCard } from "@/components/expenses/ExpenseTrackerCard" 
 import { PickupReminderNotification } from "@/components/notifications/PickupReminderNotification"
+import { MilestoneNotifier } from '@/components/notifications/MilestoneNotifier';
 
 import { formatTime } from "@/lib/formatTime"
 import { useState, useEffect } from "react"
@@ -150,6 +151,7 @@ export function DriverDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <MilestoneNotifier />
       <div className="max-w-md mx-auto min-h-screen flex flex-col relative z-10">
         <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-5 bg-card border-b h-16 px-2">

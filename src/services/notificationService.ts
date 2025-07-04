@@ -14,16 +14,45 @@ class NotificationService {
         this.isInitialized = true;
       }
     }
+
+    private getPreferences() {
+      const defaultPrefs = {
+          pickupReminders: true,
+          pickupReminderTime: 30,
+          pickupReminderSound: true,
+          performanceMilestones: true,
+          milestoneTypes: {
+            dailyEarnings: true,
+            tripCount: true,
+            hoursWorked: true,
+          },
+      };
+      if (typeof window === 'undefined') return defaultPrefs;
+      const prefsString = localStorage.getItem('notificationPreferences');
+      if (!prefsString) return defaultPrefs;
+
+      try {
+        const savedPrefs = JSON.parse(prefsString);
+        return {
+            ...defaultPrefs,
+            ...savedPrefs,
+            milestoneTypes: {
+                ...defaultPrefs.milestoneTypes,
+                ...(savedPrefs.milestoneTypes || {}),
+            }
+        };
+      } catch (e) {
+        console.error("Failed to parse notification preferences", e);
+        return defaultPrefs;
+      }
+    }
   
     schedulePickupReminder(bookingId: string, pickupTime: Date, clientName: string, pickupLocation: string) {
       if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') {
         return;
       }
 
-      // Read preferences from localStorage
-      const prefsString = localStorage.getItem('notificationPreferences');
-      const defaultPrefs = { pickupReminders: true, pickupReminderTime: 30, pickupReminderSound: true };
-      const prefs = prefsString ? {...defaultPrefs, ...JSON.parse(prefsString)} : defaultPrefs;
+      const prefs = this.getPreferences();
 
       if (!prefs.pickupReminders) {
         console.log('Pickup reminders are disabled by user preference.');
@@ -33,7 +62,6 @@ class NotificationService {
       const now = new Date();
       const timeToPickup = pickupTime.getTime() - now.getTime();
   
-      // Schedule reminder based on user preference
       const reminderOffset = (prefs.pickupReminderTime || 30) * 60 * 1000;
       const reminderTime = timeToPickup - reminderOffset;
   
@@ -47,6 +75,42 @@ class NotificationService {
           });
         }, reminderTime);
       }
+    }
+
+    showEarningsMilestone(amount: number) {
+      const prefs = this.getPreferences();
+      if (!prefs.performanceMilestones || !prefs.milestoneTypes.dailyEarnings) return;
+  
+      new Notification('Earnings Milestone!', {
+          body: `You've reached your $${Math.floor(amount)} earnings goal! Keep it up!`,
+          tag: `earnings-milestone-${amount}`,
+          icon: '/logo.png',
+          silent: !prefs.pickupReminderSound,
+      });
+    }
+  
+    showTripCountMilestone(count: number) {
+      const prefs = this.getPreferences();
+      if (!prefs.performanceMilestones || !prefs.milestoneTypes.tripCount) return;
+  
+      new Notification('Trip Milestone!', {
+          body: `Congratulations, you've completed ${count} trips this shift!`,
+          tag: `trip-milestone-${count}`,
+          icon: '/logo.png',
+          silent: !prefs.pickupReminderSound,
+      });
+    }
+  
+    showHoursWorkedMilestone(hours: number) {
+      const prefs = this.getPreferences();
+      if (!prefs.performanceMilestones || !prefs.milestoneTypes.hoursWorked) return;
+  
+      new Notification('Time Milestone!', {
+          body: `You've been on shift for ${hours} hours. Remember to take breaks!`,
+          tag: `hours-milestone-${hours}`,
+          icon: '/logo.png',
+          silent: !prefs.pickupReminderSound,
+      });
     }
 
     launchNavigation(pickupLocation: string, clientName: string) {
