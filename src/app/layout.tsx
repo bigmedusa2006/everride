@@ -1,7 +1,9 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider as NextThemesProvider } from '@/components/theme-provider';
+import { AppThemeProvider } from '@/contexts/ThemeContext';
 
 export const metadata: Metadata = {
   title: 'Prime Time',
@@ -22,10 +24,12 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
+          <AppThemeProvider>
+            {children}
+            <Toaster />
+          </AppThemeProvider>
+        </NextThemesProvider>
       </body>
     </html>
   );
