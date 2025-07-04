@@ -174,8 +174,9 @@ export function CreateBookingForm() {
     }
 
     setIsSubmitting(true);
-
     try {
+      const bookingNotes = `Passengers: ${formData.passengers || '1'}${formData.notes ? `. ${formData.notes}` : ''}`;
+
       const bookingData: Omit<Booking, 'id' | 'tip' | 'createdAt' | 'updatedAt'> = {
         clientName: formData.clientName!,
         clientPhone: formData.clientPhone!,
@@ -184,9 +185,7 @@ export function CreateBookingForm() {
         scheduledDate: format(selectedDate, 'yyyy-MM-dd'),
         scheduledTime: formData.scheduledTime!,
         fare: estimatedFare || 45,
-        notes: `Passengers: ${formData.passengers || '1'}${
-          formData.notes ? `. ${formData.notes}` : ''
-        }`,
+        notes: bookingNotes,
         status: 'scheduled',
       };
 
@@ -200,7 +199,7 @@ export function CreateBookingForm() {
       });
 
       // Reset form
-      setFormData({ passengers: '1' });
+      setFormData({ passengers: '1', notes: '' });
       setSelectedDate(undefined);
       setCurrentStep(0);
       setEstimatedFare(null);
@@ -260,7 +259,7 @@ export function CreateBookingForm() {
               variant="secondary"
               className="text-xs px-2 py-1 self-start sm:self-auto"
             >
-              {currentStep + 1}/{steps.length}
+              {`Step ${currentStep + 1}/${steps.length}`}
             </Badge>
           </div>
 
@@ -339,6 +338,7 @@ export function CreateBookingForm() {
                   Pickup Location
                 </Label>
                 <Input
+                  id="pickup"
                   value={formData.pickupLocation || ''}
                   onChange={(e) => {
                     const address = e.target.value;
@@ -361,6 +361,7 @@ export function CreateBookingForm() {
                   Destination
                 </Label>
                 <Input
+                  id="dropoff"
                   value={formData.dropoffLocation || ''}
                   onChange={(e) => {
                     const address = e.target.value;
@@ -440,10 +441,10 @@ export function CreateBookingForm() {
                     <div key={count} className="flex items-center space-x-2">
                       <RadioGroupItem
                         value={count}
-                        id={`passenger-form-${count}`}
+                        id={"passenger-form-" + count}
                       />
                       <Label
-                        htmlFor={`passenger-form-${count}`}
+                        htmlFor={"passenger-form-" + count}
                         className="text-sm font-medium cursor-pointer"
                       >
                         {count}
@@ -616,3 +617,5 @@ export function CreateBookingForm() {
     </div>
   );
 }
+
+    
