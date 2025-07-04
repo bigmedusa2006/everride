@@ -1,0 +1,42 @@
+[debug] [2025-07-04T16:49:08.047Z] ----------------------------------------------------------------------
+[debug] [2025-07-04T16:49:08.051Z] Command:       /nix/store/rbdrkcs5kkwpalxcd7c6bnm33lk2955n-nodejs-20.19.0/bin/node /home/user/.global_modules/bin/firebase hosting:disable
+[debug] [2025-07-04T16:49:08.053Z] CLI Version:   14.9.0
+[debug] [2025-07-04T16:49:08.053Z] Platform:      linux
+[debug] [2025-07-04T16:49:08.053Z] Node Version:  v20.19.0
+[debug] [2025-07-04T16:49:08.053Z] Time:          Fri Jul 04 2025 16:49:08 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-07-04T16:49:08.053Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-07-04T16:49:08.688Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-04T16:49:08.689Z] > authorizing via signed-in user (bigmedusa2006@gmail.com)
+[debug] [2025-07-04T16:49:08.689Z] [iam] checking project everride-2wkrf for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-07-04T16:49:08.696Z] No OAuth tokens found
+[debug] [2025-07-04T16:49:08.696Z] No OAuth tokens found
+[debug] [2025-07-04T16:49:08.699Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-04T16:49:08.699Z] > authorizing via signed-in user (bigmedusa2006@gmail.com)
+[debug] [2025-07-04T16:49:08.706Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/everride-2wkrf:testIamPermissions [none]
+[debug] [2025-07-04T16:49:08.706Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/everride-2wkrf:testIamPermissions x-goog-quota-user=projects/everride-2wkrf
+[debug] [2025-07-04T16:49:08.706Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/everride-2wkrf:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-07-04T16:49:08.815Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/everride-2wkrf:testIamPermissions 401
+[debug] [2025-07-04T16:49:08.815Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/everride-2wkrf:testIamPermissions {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"service":"cloudresourcemanager.googleapis.com","method":"google.cloudresourcemanager.v1.Projects.TestIamPermissions"}}]}}
+[debug] [2025-07-04T16:49:08.816Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2025-07-04T16:49:08.816Z] No OAuth tokens found
+[debug] [2025-07-04T16:49:08.817Z] No OAuth tokens found
+[debug] [2025-07-04T16:49:08.817Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-04T16:49:08.818Z] > authorizing via signed-in user (bigmedusa2006@gmail.com)
+[debug] [2025-07-04T16:49:08.818Z] [iam] error while checking permissions, command may fail: Request to https://cloudresourcemanager.googleapis.com/v1/projects/everride-2wkrf:testIamPermissions had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2025-07-04T16:49:08.819Z] No OAuth tokens found
+[debug] [2025-07-04T16:49:08.820Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/everride-2wkrf [none]
+[debug] [2025-07-04T16:49:08.889Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/everride-2wkrf 401
+[debug] [2025-07-04T16:49:08.889Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/everride-2wkrf {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2025-07-04T16:49:08.889Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2025-07-04T16:49:08.890Z] No OAuth tokens found
+[debug] [2025-07-04T16:49:08.890Z] No OAuth tokens found
+[debug] [2025-07-04T16:49:08.890Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-04T16:49:08.890Z] > authorizing via signed-in user (bigmedusa2006@gmail.com)
+[debug] [2025-07-04T16:49:08.891Z] Request to https://firebase.googleapis.com/v1beta1/projects/everride-2wkrf had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2025-07-04T16:49:08.892Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/everride-2wkrf had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+    at responseToError (/home/user/.global_modules/lib/node_modules/firebase-tools/lib/responseToError.js:52:12)
+    at RetryOperation._fn (/home/user/.global_modules/lib/node_modules/firebase-tools/lib/apiv2.js:312:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[error] 
+[error] Error: Failed to get Firebase project everride-2wkrf. Please make sure the project exists and your account has permission to access it.
