@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { Bell, Clock, Target, Settings, CheckCircle, AlertCircle } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
 import { useToast } from '@/hooks/use-toast';
-import { NotificationDemo } from './NotificationDemo';
 
 interface NotificationPreferences {
   pickupReminders: boolean;
@@ -471,9 +470,6 @@ export function NotificationSettings() {
           )}
         </CardContent>
       </Card>
-
-      {/* Notification Testing */}
-      <NotificationDemo />
     </div>
   );
 }
