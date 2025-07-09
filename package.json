@@ -1,12 +1,13 @@
 {
-  "name": "nextn",
+  "name": "everride",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 9002",
+    "dev": "vite dev",
+    "build": "vite build",
+    "emulators": "firebase emulators:start --only hosting,functions --inspect-functions",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
-    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
@@ -46,7 +47,6 @@
     "genkit": "^1.13.0",
     "lucide-react": "^0.475.0",
     "luxon": "^3.4.4",
-    "next": "15.3.3",
     "next-themes": "^0.3.0",
     "patch-package": "^8.0.0",
     "react": "^18.3.1",
@@ -65,7 +65,10 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "eslint": "9.30.1",
+    "eslint-config-next": "15.3.5",
     "genkit-cli": "^1.13.0",
+    "next": "^15.3.5",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"

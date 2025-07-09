@@ -1,0 +1,85 @@
+// src/contexts/DriverSessionContext.tsx
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth'; // Assuming you create this hook
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebase'; // Assuming your firebase config is here
+
+interface DriverSession {
+  // Define your driver session properties here
+  // Example:
+  userId: string;
+  status: 'offline' | 'online' | 'on_trip';
+  currentTripId?: string;
+  // ... other relevant session data
+}
+
+interface DriverSessionContextProps {
+  session: DriverSession | null;
+  loading: boolean;
+  error: string | null;
+  // Add any functions to interact with the session if needed
+}
+
+const DriverSessionContext = createContext<DriverSessionContextProps | undefined>(undefined);
+
+export const DriverSessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { currentUser, loading: authLoading } = useAuth();
+  const [session, setSession] = useState<DriverSession | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (authLoading) {
+      setLoading(true);
+      return;
+    }
+
+    if (!currentUser) {
+      setSession(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    const userDocRef = doc(db, 'drivers', currentUser.uid); // Assuming driver sessions are stored in a 'drivers' collection
+
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setSession({ userId: currentUser.uid, ...docSnap.data() } as DriverSession);
+          setError(null);
+        } else {
+          // Driver document might not exist yet, or was deleted
+          setSession(null);
+          setError("Driver session data not found.");
+        }
+        setLoading(false);
+      },
+      (err) => {
+        console.error("Error fetching driver session:", err);
+        setError(err.message);
+        setLoading(false);
+        setSession(null); // Clear session on error
+      }
+    );
+
+    // Clean up the listener on unmount or when user changes
+    return () => unsubscribe();
+
+  }, [currentUser, authLoading]);
+
+  return (
+    <DriverSessionContext.Provider value={{ session, loading, error }}>
+      {children}
+    </DriverSessionContext.Provider>
+  );
+};
+
+export const useDriverSession = () => {
+  const context = useContext(DriverSessionContext);
+  if (context === undefined) {
+    throw new Error('useDriverSession must be used within a DriverSessionProvider');
+  }
+  return context;
+};

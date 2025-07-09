@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Script to help update import paths after EverRide restructuring
+
+# Define old and new paths based on the restructuring
+# Add more mappings as needed
+declare -A path_mappings=(
+    ["src/components/ui"]="EverRide/client/src/components/ui"
+    ["src/components/shifts"]="EverRide/client/src/components/shifts"
+    ["src/components/core/charts"]="EverRide/client/src/components/core/charts"
+    ["src/components/trips"]="EverRide/client/src/components/trips"
+    ["src/components/expenses"]="EverRide/client/src/components/expenses"
+    ["src/components/bookings"]="EverRide/client/src/components/bookings"
+    ["src/contexts"]="EverRide/client/src/contexts"
+    ["src/hooks"]="EverRide/client/src/hooks"
+    ["src/lib"]="EverRide/client/src/lib"
+    ["src/styles"]="EverRide/client/src/styles"
+    ["src/stores"]="EverRide/client/src/stores"
+    ["src/app/api"]="EverRide/server/api"
+    ["src/ai"]="EverRide/server/functions/ai" # Assuming AI goes into functions
+    ["dataconnect"]="EverRide/server/dataconnect"
+    ["functions"]="EverRide/server/functions"
+    ["public"]="EverRide/public"
+    # Add specific file mappings if needed, e.g.:
+    # ["src/app/globals.css"]="EverRide/client/src/styles/globals.css"
+    # ["public/index.html"]="EverRide/client/index.html"
+)
+
+# Define file types to process
+file_types=("*.js" "*.jsx" "*.ts" "*.tsx")
+
+echo "Starting import path updates..."
+
+# Navigate to the root of the new EverRide structure (or adjust paths accordingly)
+# cd EverRide || { echo "Error: Could not navigate to EverRide directory."; exit 1; }
+
+# Loop through all relevant files in the client and server directories
+find EverRide/client/src EverRide/server \
+    -type f \( -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" \) |
+    while read file; do
+        echo "Processing $file..."
+        content=$(cat "$file")
+        updated_content="$content"
+
+        # Apply path mappings
+        for old_path in "${!path_mappings[@]}"; do
+            new_path="${path_mappings[$old_path]}"
+            # Simple replacement - might need refinement for specific cases
+            updated_content=$(echo "$updated_content" | sed "s|import \(.*\) from ['\"]\(.*\/${old_path}\)\(.*\)['\"]|import \1 from \"../..${new_path:11}\3\"|g") # Adjust depth as needed
+            updated_content=$(echo "$updated_content" | sed "s|require(['\"]\(.*\/${old_path}\)\(.*\)['\"])|require(\"../..${new_path:11}\3\")|g") # Adjust depth as needed
+             # Attempt relative path adjustments - THIS IS COMPLEX AND MAY NEED MANUAL FIXING
+            # The sed command above is a simplified attempt and will likely need manual correction.
+            # A robust solution requires calculating the relative path between the file being edited and the target import.
+        done
+
+        # Overwrite the file with updated content
+        echo "$updated_content" > "$file"
+    done
+
+echo "Import path update attempt completed."
+echo "Please manually review all changes and fix any incorrect import paths."
+echo "Consider using an IDE with automatic import updating features."

@@ -1,3 +1,8 @@
+print(default_api.run_terminal_command(command='git init'))
+print(default_api.run_terminal_command(command='git config --global user.name "Your Name"'))
+print(default_api.run_terminal_command(command='git config --global user.email "you@example.com"'))
+print(default_api.run_terminal_command(command='git add .'))
+print(default_api.run_terminal_command(command='git commit -m "chore: initial commit - pre EverRide"'))
 {
   "firestore": {
     "database": "(default)",
@@ -7,7 +12,7 @@
   },
   "functions": [
     {
-      "source": "functions",
+      "source": "server/functions",
       "codebase": "default",
       "ignore": [
         "node_modules",
@@ -23,5 +28,8 @@
   ],
   "emulators": {
     "singleProjectMode": true
+  },
+  "hosting": {
+    "public": "public"
   }
 }

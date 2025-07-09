@@ -1,0 +1,24 @@
+// Firebase type extensions
+import { User } from "firebase/auth";
+import { DocumentData, DocumentReference, QueryDocumentSnapshot } from "firebase/firestore";
+
+// Extend User interface with custom properties
+declare module "firebase/auth" {
+  interface User {
+    customProperty?: string;
+  }
+}
+
+// Custom Firestore data types
+export interface FirestoreDocument<T = DocumentData> {
+  id: string;
+  ref: DocumentReference<T>;
+  data: T;
+  snapshot: QueryDocumentSnapshot<T>;
+}
+
+// Custom error type for Firebase operations
+export interface FirebaseError extends Error {
+  code: string;
+  customData?: Record<string, unknown>;
+}

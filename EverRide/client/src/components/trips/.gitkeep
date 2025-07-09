@@ -1,0 +1,115 @@
+powershell
+# quick-migrate.ps1
+# Simple script to migrate Firebase project structure to EverRide structure
+# Usage: .\quick-migrate.ps1
+
+# Text formatting for console output
+function Write-Green($text) { Write-Host $text -ForegroundColor Green }
+function Write-Blue($text) { Write-Host $text -ForegroundColor Blue }
+function Write-Yellow($text) { Write-Host $text -ForegroundColor Yellow }
+function Write-Red($text) { Write-Host $text -ForegroundColor Red }
+
+# Print header
+Write-Blue "=========================================================="
+Write-Blue "  EverRide Quick Migration Script"
+Write-Blue "  Restructure Firebase project to EverRide format"
+Write-Blue "=========================================================="
+Write-Host ""
+
+# Confirm with user
+Write-Yellow "This script will restructure your project in the current directory."
+Write-Yellow "Make sure you have committed all changes to Git before proceeding."
+$confirmation = Read-Host "Do you want to continue? (y/n)"
+if ($confirmation -ne 'y') {
+    Write-Host "Migration cancelled. Exiting..."
+    exit
+}
+
+# Create backup
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$backupDir = "../project_backup_$timestamp"
+Write-Host "Creating backup at: $backupDir"
+Copy-Item -Path . -Destination $backupDir -Recurse -Force -Exclude "node_modules"
+Write-Green "✓ Backup created"
+
+# Step 1: Create new directory structure
+Write-Blue "Step 1: Creating directory structure..."
+
+$directories = @(
+    "client/src/components/ui",
+    "client/src/components/shifts",
+    "client/src/components/core/charts",
+    "client/src/components/trips",
+    "client/src/components/expenses",
+    "client/src/components/bookings",
+    "client/src/contexts",
+    "client/src/hooks",
+    "client/src/pages",
+    "client/src/lib",
+    "client/src/styles",
+    "client/src/stores",
+    "server/functions",
+    "server/dataconnect",
+    "server/api",
+    "public/icons"
+)
+
+foreach ($dir in $directories) {
+    if (!(Test-Path $dir)) {
+        New-Item -Path $dir -ItemType Directory -Force | Out-Null
+        Write-Host "  Created: $dir"
+    }
+}
+Write-Green "✓ Directory structure created"
+
+# Step 2: Move files (This section needs to be customized based on your project)
+# This is a placeholder. You need to add Move-Item commands here
+# to move your specific files/folders to the new structure.
+Write-Blue "Step 2: Moving files..."
+Write-Yellow "  (This is a placeholder. You need to customize this section.)"
+
+# Example:
+# if (Test-Path "src/components/Button.tsx") {
+#     Move-Item -Path "src/components/Button.tsx" -Destination "client/src/components/ui/Button.tsx" -Force
+#     Write-Host "  Moved: src/components/Button.tsx -> client/src/components/ui/Button.tsx"
+# }
+# if (Test-Path "src/app/page.tsx") {
+#     Move-Item -Path "src/app/page.tsx" -Destination "client/src/pages/index.tsx" -Force
+#     Write-Host "  Moved: src/app/page.tsx -> client/src/pages/index.tsx"
+# }
+
+Write-Green "✓ File moving completed (customize Step 2 in the script!)"
+
+
+# Step 3: Clean up empty original directories (Optional but recommended)
+Write-Blue "Step 3: Cleaning up empty directories..."
+
+# Get all directories in the current location, excluding the new structure and backup
+$originalDirs = Get-ChildItem -Path . -Directory -Recurse | Where-Object {
+    $_.FullName -notmatch "\\client\\" -and $_.FullName -notmatch "\\server\\" -and $_.FullName -notmatch "\\public\\" -and $_.FullName -notmatch [regex]::Escape($backupDir) -and $_.GetFileSystemInfos().Count -eq 0
+}
+
+foreach ($dir in $originalDirs | Sort-Object FullName -Descending) {
+    if (-not (Get-ChildItem -Path $dir -Recurse | Where-Object {!$_.PSIsContainer})) { # Check if it contains files
+       try {
+           Remove-Item -Path $dir -Recurse -Force
+           Write-Host "  Removed empty directory: $($dir.FullName)"
+       } catch {
+           Write-Yellow "  Could not remove directory (might not be empty now or in use): $($dir.FullName)"
+       }
+    }
+}
+Write-Green "✓ Directory cleanup attempted"
+
+
+Write-Green "✓ Migration completed!"
+Write-Host ""
+Write-Yellow "Next steps:"
+Write-Host "1. **CRITICAL:** Review Step 2 in quick-migrate.ps1 and add specific Move-Item commands for YOUR project's files."
+Write-Host "2. Run the script again after customizing Step 2."
+Write-Host "3. Update import paths in your code manually or with a suitable tool."
+Write-Host "4. Run 'npm install' to verify dependencies in the new EverRide root."
+Write-Host "5. Check for any TypeScript errors (npm run check)"
+Write-Host "6. Start your dev server (npm run dev)"
+Write-Host ""
+Write-Blue "Happy coding with your restructured EverRide project! 🚗💨"

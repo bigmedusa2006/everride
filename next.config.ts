@@ -92,4 +92,22 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+const finalConfig: NextConfig = {
+  ...nextConfig,
+  webpack: (config, { isDev, isBackend }) => {
+    // Configure Webpack fallbacks for Node.js modules
+    config.resolve.fallback = {
+      "mongodb-client-encryption": false,
+      "aws4": false,
+      "snappy": false,
+      "bson": false,
+      "lz4": false,
+      "zstd": false,
+      "kerberos": false,
+    };
+ return config;
+  },
+  transpilePackages: ['@genkit-ai/firebase', '@genkit-ai/vertexai'],
+};
+
+export default withPWA(finalConfig);
