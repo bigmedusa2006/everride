@@ -1,1 +1,0 @@
-export function ShiftSummaryDialog({ open, onClose, onConfirmClose, summaryData }: { open: boolean, onClose: () => void, onConfirmClose: () => void, summaryData: any }) { return open ? <div>ShiftSummaryDialog</div> : null; }

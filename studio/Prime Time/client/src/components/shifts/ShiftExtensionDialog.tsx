@@ -1,1 +1,0 @@
-export function ShiftExtensionDialog({ open, onExtend, onDecline, currentHours, maxAllowedHours }: { open: boolean, onExtend: () => void, onDecline: () => void, currentHours: number, maxAllowedHours: number }) { return open ? <div>ShiftExtensionDialog</div> : null; }
